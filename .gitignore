@@ -21,3 +21,24 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+
+# ========== 下面是新增的VS C++项目忽略规则 ==========
+# VS 缓存文件夹（重点：解决你之前148MB大文件报错）
+.vs/
+*.ipch
+*.suo
+*.user
+
+# 编译输出目录
+Debug/
+Release/
+x64/
+x86/
+
+# 编译中间文件
+*.obj
+*.pdb
+*.ilk
+*.log
+*.tlog
+*.lastbuildstate
