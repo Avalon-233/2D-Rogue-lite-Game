@@ -1,4 +1,4 @@
-/*
+#include"stdafx.h"
 #include"Game.h"
 
 void HandleEvent(const sf::Event&) {}//other events
@@ -11,6 +11,7 @@ void Game::Start(void)
 	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "Project1");
 	_gameState = Game::Playing;
 	_mainWindow.setVerticalSyncEnabled(true);
+	_mainWindow.setKeyRepeatEnabled(false);
 
 	while (!IsExiting())
 	{
@@ -30,12 +31,29 @@ void Game::GameLoop()
 	while (const std::optional event = Game::_mainWindow.pollEvent())
 	{
 		
+		switch (_gameState)
+		{
+			case Game::Playing:
+			{
+				_mainWindow.clear(sf::Color(0,0,255));
+				_mainWindow.display();
+
+				if (event->is<sf::Event::Closed>())
+				{
+					_gameState = Game::Exiting;
+				}
+				event->visit([](const auto& type) {});
+				break;
+			}
+		}
+		/*
 		if (event->is<sf::Event::Closed>())
 		{
 			_gameState = Game::Exiting;
 		}
 
-		event->visit([this](const auto& type) {this->HandleEvent(type);});
+		event->visit([](const auto& type) {HandleEvent(type);});
+		*/
 	}
 
 	//Update
@@ -47,4 +65,3 @@ void Game::GameLoop()
 
 Game::GameState Game::_gameState = Uninitialized;
 sf::RenderWindow Game::_mainWindow;
-*/
