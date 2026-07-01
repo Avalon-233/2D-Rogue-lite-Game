@@ -44,7 +44,9 @@ void Game::GameLoop()
 			}
 		}
 	}
+	_mainWindow.clear();
 
+	_mainWindow.display();
 }
 
 Game::GameState Game::_gameState = Uninitialized;
