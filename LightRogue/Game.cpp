@@ -20,6 +20,9 @@ void Game::Start(void)
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
 
+	Player *player=new Player(sf::Texture());
+	_gameWorld.Add("player", player);
+
 	while (!IsExiting())
 	{
 		GameLoop();
@@ -58,12 +61,14 @@ void Game::GameLoop()
 		//*/
 	}
 
-	//Update();
+	_gameWorld.UpdateAll(_clock.restart().asSeconds());
 
 	_mainWindow.clear();
-	//Draw();
+	_gameWorld.DrawAll(_mainWindow);
 	_mainWindow.display();
 }
 
 Game::GameState Game::_gameState = Uninitialized;
 sf::RenderWindow Game::_mainWindow;
+GameWorld Game::_gameWorld;
+sf::Clock _clock;
