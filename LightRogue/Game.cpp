@@ -13,7 +13,7 @@ void Game::Start(void)
 	if (_gameState != Uninitialized)
 		return;
 
-	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "Project1");
+	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "LightRogue");
 	_gameState = Game::Playing;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
