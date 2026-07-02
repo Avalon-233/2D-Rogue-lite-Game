@@ -8,12 +8,14 @@ void Game::HandleEvent(const sf::Event::Closed&)
 
 void Game::HandleEvent(const sf::Event&) {}//other events
 
+
+
 void Game::Start(void)
 {
 	if (_gameState != Uninitialized)
 		return;
 
-	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "Project1");
+	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "LightRogue");
 	_gameState = Game::Playing;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
@@ -56,10 +58,10 @@ void Game::GameLoop()
 		//*/
 	}
 
-	//Update
+	//Update();
 
 	_mainWindow.clear();
-	//_mainWindow.draw();
+	//Draw();
 	_mainWindow.display();
 }
 
