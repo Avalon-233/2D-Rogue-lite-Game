@@ -18,5 +18,6 @@ private:
 	static GameState _gameState;
 	static sf::RenderWindow _mainWindow;
 
+	static void HandleEvent(const sf::Event::Closed&);
 	static void HandleEvent(const sf::Event&);
 };

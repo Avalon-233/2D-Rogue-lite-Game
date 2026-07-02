@@ -1,7 +1,12 @@
 #include"stdafx.h"
 #include"Game.h"
 
-void HandleEvent(const sf::Event&) {}//other events
+void Game::HandleEvent(const sf::Event::Closed&)
+{
+	_gameState = Exiting;
+}
+
+void Game::HandleEvent(const sf::Event&) {}//other events
 
 void Game::Start(void)
 {
@@ -30,7 +35,7 @@ void Game::GameLoop()
 {
 	while (const std::optional event = Game::_mainWindow.pollEvent())
 	{
-		
+		/*
 		switch (_gameState)
 		{
 			case Game::Playing:
@@ -46,14 +51,9 @@ void Game::GameLoop()
 				break;
 			}
 		}
-		/*
-		if (event->is<sf::Event::Closed>())
-		{
-			_gameState = Game::Exiting;
-		}
-
+		/*/
 		event->visit([](const auto& type) {HandleEvent(type);});
-		*/
+		//*/
 	}
 
 	//Update
