@@ -9,8 +9,12 @@ public:
 
 	void Update(float deltaTime);
 	void Draw(sf::RenderWindow& renderWindow);
+
 	float GetSpeed()const;
+	float GetHP()const;
 
 private:
+	float _HP;
+	float _maxHP;
 	float _speed;
 };

@@ -16,26 +16,32 @@ void Player::Draw(sf::RenderWindow& renderWindow)
 	renderWindow.draw(_sprite);
 }
 
+void Player::Update(float deltaTime)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
+	{
+		_sprite.move({ 0.f, -_speed * deltaTime });
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S))
+	{
+		_sprite.move({ 0.f, _speed * deltaTime });
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
+	{
+		_sprite.move({ -_speed * deltaTime, 0.f });
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
+	{
+		_sprite.move({ _speed * deltaTime, 0.f });
+	}
+}
+
 float Player::GetSpeed()const
 {
 	return _speed;
 }
 
-void Player::Update(float deltaTime)
+float Player::GetHP()const
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
-	{
-		_sprite.move({0.f, -_speed * deltaTime});
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S))
-	{
-		_sprite.move({0.f, _speed * deltaTime});
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
-	{
-		_sprite.move({-_speed * deltaTime, 0.f});
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
-	{
-		_sprite.move({_speed * deltaTime, 0.f});
-	}
+	return _HP;
+}

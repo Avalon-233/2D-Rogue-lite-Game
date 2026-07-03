@@ -2,6 +2,11 @@
 #include<string>
 #include"SFML\Graphics.hpp"
 
+class Player;
+class Enemy;
+class Projectile;
+
+
 class GameObject
 {
 public:
@@ -9,14 +14,21 @@ public:
 	virtual ~GameObject();
 
 	virtual void Draw(sf::RenderWindow& window);
-	virtual void SetPosition(float x, float y);
-
 	virtual void Update(float deltaTime);
-	virtual sf::Vector2f GetPosition()const;
+	virtual void HandleCollision();
+
+	sf::FloatRect GetBounds()const;
+	void SetPosition(float x, float y);
+	sf::Vector2f GetPosition()const;
+
+	bool IsExisting()const;
+	void Destroy();
 
 protected:
 	sf::Sprite _sprite;
-	
-	//sf::Sprite& Getsprite();
+
+private:
+	sf::Vector2f _position{};
+	bool _isExisting = true;
 
 };

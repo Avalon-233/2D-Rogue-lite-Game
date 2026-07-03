@@ -3,6 +3,9 @@
 #include"SFML/Graphics.hpp"
 #include"Player.h"
 #include"GameWorld.h"
+#include"Enemy.h"
+#include"Projectile.h"
+#include"Pickup.h"
 
 class Game
 {
@@ -12,8 +15,6 @@ public:
 private:
 	static bool IsExiting();
 	static void GameLoop();
-	//static void Update();
-	//static void Render();
 
 	enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exiting };
 

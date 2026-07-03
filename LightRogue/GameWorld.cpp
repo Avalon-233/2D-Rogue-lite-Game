@@ -1,5 +1,10 @@
 #include"stdafx.h"
 #include"GameWorld.h"
+#include"GameObject.h"
+#include "Player.h"
+#include "Enemy.h"
+#include "Projectile.h"
+#include "Pickup.h"
 
 GameWorld::GameWorld()
 {
@@ -7,62 +12,95 @@ GameWorld::GameWorld()
 
 GameWorld::~GameWorld()
 {
-	std::for_each(_gameObjects.begin(), _gameObjects.end(), GameObjectDeallocator());
 }
 
-void GameWorld::Add(std::string name, GameObject* gameObject)
+void GameWorld::Add(std::unique_ptr<Player> player)
 {
-	_gameObjects.insert(std::pair<std::string, GameObject*>(name,gameObject));
-}
-void GameWorld::Remove(std::string name)
-{
-	auto it = _gameObjects.find(name);
-	if (it != _gameObjects.end())
-	{
-		delete it->second;
-		_gameObjects.erase(it);
-	}
+	_player = std::move(player);
 }
 
-GameObject* GameWorld::Get(std::string name) const
+void GameWorld::Add(std::unique_ptr<Enemy> enemy)
 {
-	auto it = _gameObjects.find(name);
-	if (it != _gameObjects.end())
-	{
-		return it->second;
-	}
-	return nullptr;
+	_enemies.push_back(std::move(enemy));
 }
 
-int GameWorld::GetCount()const
+void GameWorld::Add(std::unique_ptr<Projectile> projectile)
 {
-	return _gameObjects.size();
+	_projectiles.push_back(std::move(projectile));
+}
+
+void GameWorld::Add(std::unique_ptr<Pickup> pickup)
+{
+	_pickups.push_back(std::move(pickup));
 }
 
 void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 {
-	for (auto it = _gameObjects.begin(); it != _gameObjects.end(); ++it)
-	{
-		it->second->Draw(renderWindow);
-	}
-	/*
-	for (auto it : _gameObjects)
-	{
-		it->second->Draw(renderWindow);
-	}
-	*/
+	if(_player)_player->Draw(renderWindow);
+	for(auto& it : _enemies)
+		it->Draw(renderWindow);
+	for (auto& it : _projectiles)
+		it->Draw(renderWindow);
+	for (auto& it : _pickups)
+		it->Draw(renderWindow);
 }
 
 void GameWorld::UpdateAll(float deltaTime)
 {
-	for (auto it = _gameObjects.begin(); it != _gameObjects.end(); ++it)
+	if(_player)_player->Update(deltaTime);
+	for (auto& it :_enemies)
+		it->Update(deltaTime);
+	for (auto& it : _projectiles)
+		it->Update(deltaTime);
+	for (auto& it : _pickups)
+		it->Update(deltaTime);
+}
+
+void GameWorld::Collision()
+{
+	
+}
+
+void GameWorld::CleanUp()
+{
+	auto itEnemy = _enemies.begin();
+	while (itEnemy != _enemies.end())
 	{
-		it->second->Update(deltaTime);
+		if ((*itEnemy)->IsExisting())
+			++itEnemy;
+		else itEnemy = _enemies.erase(itEnemy);
+	}
+	auto itProjectile = _projectiles.begin();
+	while (itProjectile != _projectiles.end())
+	{
+		if ((*itProjectile)->IsExisting())
+			++itProjectile;
+		else itProjectile = _projectiles.erase(itProjectile);
+	}
+	auto itPickup = _pickups.begin();
+	while (itPickup != _pickups.end())
+	{
+		if ((*itPickup)->IsExisting())
+			++itPickup;
+		else itPickup = _pickups.erase(itPickup);
 	}
 	/*
-	for (auto it : _gameObjects)
-	{
-		it->second->Update(deltaTime);
-	}
+	//AI:a more efficient way to remove GameObjects
+	_enemies.erase(
+		std::remove_if(_enemies.begin(), _enemies.end(),
+			[](const std::unique_ptr<Enemy>& p) { return !p->IsExisting(); }),
+		_enemies.end()
+	);
+	_projectiles.erase(
+		std::remove_if(_projectiles.begin(), _projectiles.end(),
+			[](const std::unique_ptr<Projectile>& p) { return !p->IsExisting(); }),
+		_projectiles.end()
+	);
+	_pickups.erase(
+		std::remove_if(_pickups.begin(), _pickups.end(),
+			[](const std::unique_ptr<Pickup>& p) { return !p->IsExisting(); }),
+		_pickups.end()
+	);
 	*/
+
 }

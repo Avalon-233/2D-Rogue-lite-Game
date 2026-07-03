@@ -1,4 +1,5 @@
 #include"stdafx.h"
+#include"GameObject.h"
 #include"Game.h"
 
 void Game::HandleEvent(const sf::Event::Closed&)
@@ -19,9 +20,14 @@ void Game::Start(void)
 	_gameState = Game::Playing;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
-
-	Player *player=new Player(sf::Texture());
-	_gameWorld.Add("player", player);
+	_clock.restart();
+	
+	//Create a player
+	sf::Image image({ 32,32 }, sf::Color::Green);
+	sf::Texture playerTexture(image);
+	std::unique_ptr<Player> player = std::make_unique<Player>(playerTexture);
+	player->SetPosition(512.f, 384.f);
+	_gameWorld.Add(std::move(player));
 
 	while (!IsExiting())
 	{
@@ -40,25 +46,7 @@ void Game::GameLoop()
 {
 	while (const std::optional event = Game::_mainWindow.pollEvent())
 	{
-		/*
-		switch (_gameState)
-		{
-			case Game::Playing:
-			{
-				_mainWindow.clear(sf::Color(0,0,255));
-				_mainWindow.display();
-
-				if (event->is<sf::Event::Closed>())
-				{
-					_gameState = Game::Exiting;
-				}
-				event->visit([](const auto& type) {});
-				break;
-			}
-		}
-		/*/
 		event->visit([](const auto& type) {HandleEvent(type);});
-		//*/
 	}
 
 	_gameWorld.UpdateAll(_clock.restart().asSeconds());
@@ -71,4 +59,4 @@ void Game::GameLoop()
 Game::GameState Game::_gameState = Uninitialized;
 sf::RenderWindow Game::_mainWindow;
 GameWorld Game::_gameWorld;
-sf::Clock _clock;
+sf::Clock Game::_clock;

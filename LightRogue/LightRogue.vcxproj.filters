@@ -33,6 +33,15 @@
     <ClCompile Include="GameWorld.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pickup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -48,6 +57,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="GameWorld.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pickup.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
