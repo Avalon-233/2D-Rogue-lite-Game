@@ -15,7 +15,7 @@ public:
 
 	virtual void Draw(sf::RenderWindow& window);
 	virtual void Update(float deltaTime);
-	virtual void HandleCollision();
+	virtual void HandleCollision(GameObject* gameObject);
 
 	sf::FloatRect GetBounds()const;
 	void SetPosition(float x, float y);
