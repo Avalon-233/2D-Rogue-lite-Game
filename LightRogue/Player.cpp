@@ -11,13 +11,9 @@ Player::~Player()
 {
 }
 
-void Player::Draw(sf::RenderWindow& renderWindow)
-{
-	renderWindow.draw(_sprite);
-}
-
 void Player::Update(float deltaTime)
 {
+	//move
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
 	{
 		_sprite.move({ 0.f, -_speed * deltaTime });
@@ -34,6 +30,54 @@ void Player::Update(float deltaTime)
 	{
 		_sprite.move({ _speed * deltaTime, 0.f });
 	}
+	//check HP
+	if (_HP <= 0.f)
+		Destroy();
+	if (_HP > _maxHP)
+		_HP = _maxHP;
+	//shoot
+	_shootTimer += deltaTime;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		if (_shootTimer >= _shootCooldown)
+		{
+			Shoot();
+			_shootTimer=0.f;
+		}
+	}
+	//level up
+	if (_experience >= _level * 10)
+	{
+		_level++;
+		_experience-= _level * 10;
+		//boost stats
+	}
+}
+
+void Player::HandleCollison(Enemy* enemy)
+{
+	/*
+	_HP -= enemy->_damage;
+	*/
+}
+
+void Player::HandleCollison(Projectile* projectile)
+{
+	/*
+	_HP-= projectile->_damage;
+	*/
+}
+
+void Player::HandleCollison(Pickup* pickup)
+{
+	/*
+	_experience += pickup->_experienceUp;
+	*/
+}
+
+void Player::Shoot()
+{
+	//create a projectile and Add() it
 }
 
 float Player::GetSpeed()const

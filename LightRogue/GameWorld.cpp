@@ -58,7 +58,45 @@ void GameWorld::UpdateAll(float deltaTime)
 
 void GameWorld::Collision()
 {
-	
+	if(!_player)return;
+	//enemy vs player
+	for (auto& it : _enemies)
+	{
+		if (it->IsExisting() && it->GetBounds().findIntersection(_player->GetBounds()))
+		{
+			it->HandleCollision(_player.get());
+			_player->HandleCollison(it.get());
+		}
+	}
+	//projectile vs player/enemy
+	for (auto& it : _projectiles)
+	{
+		if (it->IsExisting() /*&& itProjectile->GetOwner() == enemy )*/ && it->GetBounds().findIntersection(_player->GetBounds()))
+		{
+			it->HandleCollision(_player.get());
+			_player->HandleCollison(it.get());
+		}
+		if (it->IsExisting() /*&& itProjectile->GetOwner() == player*/)
+		{
+			for(auto& itEnemy : _enemies)
+			{
+				if (it->GetBounds().findIntersection(itEnemy->GetBounds()))
+				{
+					it->HandleCollision(itEnemy.get());
+					itEnemy->HandleCollision(it.get());
+				}
+			}
+		}
+	}
+	//pickup vs player
+	for (auto& it : _pickups)
+	{
+		if (it->GetBounds().findIntersection(_player->GetBounds()))
+		{
+			it->HandleCollision(_player.get());
+			_player->HandleCollison(it.get());
+		}
+	}
 }
 
 void GameWorld::CleanUp()

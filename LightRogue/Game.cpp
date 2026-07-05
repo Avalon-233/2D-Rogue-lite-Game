@@ -11,7 +11,7 @@ void Game::HandleEvent(const sf::Event&) {}//other events
 
 
 
-void Game::Start(void)
+void Game::Start()
 {
 	if (_gameState != Uninitialized)
 		return;
