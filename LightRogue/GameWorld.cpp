@@ -64,7 +64,7 @@ void GameWorld::Collision()
 	{
 		if (it->IsExisting() && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
-			it->HandleCollision(_player.get());
+			it->HandleCollison(_player.get());
 			_player->HandleCollison(it.get());
 		}
 	}
@@ -73,7 +73,7 @@ void GameWorld::Collision()
 	{
 		if (it->IsExisting() /*&& itProjectile->GetOwner() == enemy )*/ && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
-			it->HandleCollision(_player.get());
+			it->HandleCollison(_player.get());
 			_player->HandleCollison(it.get());
 		}
 		if (it->IsExisting() /*&& itProjectile->GetOwner() == player*/)
@@ -82,8 +82,8 @@ void GameWorld::Collision()
 			{
 				if (it->GetBounds().findIntersection(itEnemy->GetBounds()))
 				{
-					it->HandleCollision(itEnemy.get());
-					itEnemy->HandleCollision(it.get());
+					it->HandleCollison(itEnemy.get());
+					itEnemy->HandleCollison(it.get());
 				}
 			}
 		}
