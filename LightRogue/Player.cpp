@@ -57,21 +57,21 @@ void Player::Update(float deltaTime)
 void Player::HandleCollison(Enemy* enemy)
 {
 	/*
-	_HP -= enemy->_damage;
+	_HP -= enemy->damage;
 	*/
 }
 
 void Player::HandleCollison(Projectile* projectile)
 {
-	/*
-	_HP-= projectile->_damage;
-	*/
+	
+	_HP-= projectile->GetDamage();
+	
 }
 
 void Player::HandleCollison(Pickup* pickup)
 {
 	/*
-	_experience += pickup->_experienceUp;
+	_experience += pickup->experienceUp;
 	*/
 }
 
