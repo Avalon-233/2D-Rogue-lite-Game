@@ -7,7 +7,7 @@ public:
 	Player(const sf::Texture& texture);
 	~Player();
 
-	void Update(float deltaTime);
+	void Update(float deltaTime)override;
 	void HandleCollison(Enemy* enemy);
 	void HandleCollison(Projectile* projectile);
 	void HandleCollison(Pickup* pickup);

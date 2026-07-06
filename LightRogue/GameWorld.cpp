@@ -71,12 +71,12 @@ void GameWorld::Collision()
 	//projectile vs player/enemy
 	for (auto& it : _projectiles)
 	{
-		if (it->IsExisting() /*&& itProjectile->GetOwner() == enemy )*/ && it->GetBounds().findIntersection(_player->GetBounds()))
+		if (it->IsExisting() && (!it->IsFriendly()) && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
 			it->HandleCollison(_player.get());
 			_player->HandleCollison(it.get());
 		}
-		if (it->IsExisting() /*&& itProjectile->GetOwner() == player*/)
+		if (it->IsExisting() && it->IsFriendly())
 		{
 			for(auto& itEnemy : _enemies)
 			{
@@ -93,7 +93,7 @@ void GameWorld::Collision()
 	{
 		if (it->GetBounds().findIntersection(_player->GetBounds()))
 		{
-			it->HandleCollision(_player.get());
+			it->HandleCollison(_player.get());
 			_player->HandleCollison(it.get());
 		}
 	}
