@@ -8,6 +8,8 @@
 
 GameWorld::GameWorld()
 {
+	sf::Image pickupImage({ 16,16 }, sf::Color::Yellow);
+	assert(_pickupTexture.loadFromImage(pickupImage));
 }
 
 GameWorld::~GameWorld()
@@ -80,7 +82,7 @@ void GameWorld::Collision()
 		{
 			for(auto& itEnemy : _enemies)
 			{
-				if (it->GetBounds().findIntersection(itEnemy->GetBounds()))
+				if (it->IsExisting() && itEnemy->IsExisting() && it->GetBounds().findIntersection(itEnemy->GetBounds()))
 				{
 					it->HandleCollison(itEnemy.get());
 					itEnemy->HandleCollison(it.get());
@@ -91,7 +93,7 @@ void GameWorld::Collision()
 	//pickup vs player
 	for (auto& it : _pickups)
 	{
-		if (it->GetBounds().findIntersection(_player->GetBounds()))
+		if (it->IsExisting() && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
 			it->HandleCollison(_player.get());
 			_player->HandleCollison(it.get());
@@ -106,7 +108,13 @@ void GameWorld::CleanUp()
 	{
 		if ((*itEnemy)->IsExisting())
 			++itEnemy;
-		else itEnemy = _enemies.erase(itEnemy);
+		else
+		{
+			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue());
+			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
+			_pickups.push_back(std::move(pickup));
+			itEnemy = _enemies.erase(itEnemy);
+		}
 	}
 	auto itProjectile = _projectiles.begin();
 	while (itProjectile != _projectiles.end())

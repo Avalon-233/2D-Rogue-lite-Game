@@ -29,5 +29,6 @@ private:
 	std::vector<std::unique_ptr<Enemy>> _enemies;
 	std::vector<std::unique_ptr<Projectile>> _projectiles;
 	std::vector<std::unique_ptr<Pickup>> _pickups;
+	sf::Texture _pickupTexture;
 	
 };

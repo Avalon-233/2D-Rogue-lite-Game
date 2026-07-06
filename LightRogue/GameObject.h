@@ -11,7 +11,7 @@ class GameObject
 {
 public:
 	GameObject(const sf::Texture& texture);
-	~GameObject();
+	virtual ~GameObject();
 
 	virtual void Draw(sf::RenderWindow& window);
 	virtual void Update(float deltaTime);

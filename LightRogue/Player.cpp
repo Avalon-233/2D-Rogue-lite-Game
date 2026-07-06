@@ -1,6 +1,9 @@
 #include"stdafx.h"
 #include"Player.h"
 #include"Game.h"
+#include"Enemy.h"
+#include"Projectile.h"
+#include"Pickup.h"
 
 Player::Player(const sf::Texture& texture) :GameObject(texture)
 {
@@ -46,19 +49,12 @@ void Player::Update(float deltaTime)
 		}
 	}
 	//level up
-	if (_experience >= _level * 10)
-	{
-		_level++;
-		_experience-= _level * 10;
-		//boost stats
-	}
+	CheckLevelUp();
 }
 
 void Player::HandleCollison(Enemy* enemy)
 {
-	/*
-	_HP -= enemy->damage;
-	*/
+	_HP -= enemy->GetDamage();
 }
 
 void Player::HandleCollison(Projectile* projectile)
@@ -70,14 +66,18 @@ void Player::HandleCollison(Projectile* projectile)
 
 void Player::HandleCollison(Pickup* pickup)
 {
-	/*
-	_experience += pickup->experienceUp;
-	*/
+	AddExperience(pickup->GetExperienceValue());
 }
 
 void Player::Shoot()
 {
 	//create a projectile and Add() it
+}
+
+void Player::AddExperience(float experience)
+{
+	_experience += experience;
+	CheckLevelUp();
 }
 
 float Player::GetSpeed()const
@@ -88,4 +88,28 @@ float Player::GetSpeed()const
 float Player::GetHP()const
 {
 	return _HP;
+}
+
+float Player::GetExperience()const
+{
+	return _experience;
+}
+
+int Player::GetLevel()const
+{
+	return _level;
+}
+
+void Player::CheckLevelUp()
+{
+	float experienceNeeded = _level * 10.f;
+	while (_experience >= experienceNeeded)
+	{
+		_experience -= experienceNeeded;
+		_level++;
+		_maxHP += 10.f;
+		_HP = _maxHP;
+		_speed += 2.f;
+		experienceNeeded = _level * 10.f;
+	}
 }

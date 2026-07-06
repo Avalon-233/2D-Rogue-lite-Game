@@ -49,7 +49,10 @@ void Game::GameLoop()
 		event->visit([](const auto& type) {HandleEvent(type);});
 	}
 
-	_gameWorld.UpdateAll(_clock.restart().asSeconds());
+	float deltaTime = _clock.restart().asSeconds();
+	_gameWorld.UpdateAll(deltaTime);
+	_gameWorld.Collision();
+	_gameWorld.CleanUp();
 
 	_mainWindow.clear();
 	_gameWorld.DrawAll(_mainWindow);
