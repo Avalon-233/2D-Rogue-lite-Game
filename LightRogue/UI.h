@@ -1,7 +1,8 @@
 #pragma once
-#pragma once
 
 #include "SFML/Graphics.hpp"
+
+#include <string>
 
 class Player;
 class Enemy;
@@ -33,9 +34,18 @@ public:
 
     void DrawPlayerHUD(sf::RenderWindow& window, const Player* player);
     void DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy);
+    void DrawUpgradeChoices(sf::RenderWindow& window, const Player* player);
 
 private:
+    void DrawUpgradeCard(sf::RenderWindow& window, sf::Vector2f position, sf::Vector2f size, int shortcut, int upgradeType);
+    void DrawUpgradeIcon(sf::RenderWindow& window, sf::Vector2f center, int upgradeType);
+    void DrawText(sf::RenderWindow& window, const std::string& text, unsigned int size, sf::Vector2f position, sf::Color color, bool centered);
+    const char* GetUpgradeName(int upgradeType)const;
+    const char* GetUpgradeDescription(int upgradeType)const;
+
     StatusBar _playerHealthBar;
     StatusBar _playerExperienceBar;
     StatusBar _enemyHealthBar;
+    sf::Font _font;
+    bool _fontLoaded = false;
 };

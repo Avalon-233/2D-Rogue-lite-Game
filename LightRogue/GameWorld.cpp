@@ -201,6 +201,11 @@ void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
 	}
 }
 
+void GameWorld::DrawUpgradeUI(sf::RenderWindow& renderWindow)
+{
+	_uiManager.DrawUpgradeChoices(renderWindow, _player.get());
+}
+
 bool GameWorld::IsPlayerDead()const
 {
 	return _player && !_player->IsExisting();

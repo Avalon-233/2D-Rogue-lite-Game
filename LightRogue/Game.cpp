@@ -101,6 +101,8 @@ void Game::GameLoop()
 	_mainWindow.clear();
 	if (_gameState != ShowingSplash)
 		_gameWorld.DrawAll(_mainWindow);
+	if (_gameState == Upgrading)
+		_gameWorld.DrawUpgradeUI(_mainWindow);
 	UpdateWindowTitle();
 	_mainWindow.display();
 }

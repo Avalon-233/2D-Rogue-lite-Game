@@ -28,6 +28,7 @@ public:
 	void CleanUp();
 
 	void DrawUI(sf::RenderWindow& renderWindow);
+	void DrawUpgradeUI(sf::RenderWindow& renderWindow);
 	bool IsPlayerDead()const;
 	bool IsTimeUp()const;
 	bool HasPendingUpgrade()const;
