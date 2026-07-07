@@ -13,6 +13,8 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 #include <memory>
 #include <optional>
+#include <random>
 #include <vector>
