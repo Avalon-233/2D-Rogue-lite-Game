@@ -1,0 +1,177 @@
+LightRogue enemy and pickup module changes
+===========================================
+
+Branch target
+-------------
+This work is prepared for the new branch develop_y.
+
+Build verification
+------------------
+Verified with:
+
+MSBuild LightRogue.vcxproj /p:Configuration=Debug /p:Platform=x64 /v:minimal
+
+Result:
+
+LightRogue.vcxproj -> LightRogue\x64\Debug\LightRogue.exe
+
+
+Main purpose
+------------
+This change completes the first usable version of the enemy, pickup, experience,
+and simple level-up flow.
+
+The intended game flow is:
+
+1. A friendly Projectile collides with an Enemy.
+2. Enemy subtracts HP according to Projectile damage.
+3. If Enemy HP reaches 0, Enemy calls Destroy().
+4. GameWorld::CleanUp finds the destroyed Enemy.
+5. Before erasing the Enemy, GameWorld directly constructs a Pickup at the
+   Enemy position and pushes it into _pickups.
+6. Player collides with the Pickup.
+7. Player gains the Pickup experience value.
+8. If Player has enough experience, Player levels up.
+
+
+Files modified
+--------------
+LightRogue/Enemy.h
+LightRogue/Enemy.cpp
+
+Added basic Enemy data and behavior:
+
+- _target: the Player that Enemy can chase.
+- _HP: Enemy health.
+- _damage: damage caused to Player.
+- _speed: movement speed.
+- _experienceValue: experience dropped after death.
+- Update(float deltaTime): moves Enemy toward target Player.
+- HandleCollison(Projectile* projectile): subtracts projectile damage and
+  destroys Enemy when HP is 0 or lower.
+- HandleCollison(Player* player): placeholder for Enemy-vs-Player collision.
+- SetTarget(Player* player): assigns the Player target.
+- GetDamage(): exposes Enemy damage to Player.
+- GetExperienceValue(): exposes dropped experience to GameWorld.
+
+
+LightRogue/Pickup.h
+LightRogue/Pickup.cpp
+
+Added basic Pickup data and behavior:
+
+- _experienceValue: how much experience this Pickup gives.
+- Pickup(const sf::Texture& texture, float experienceValue): constructs the
+  Pickup with texture and experience value.
+- HandleCollison(Player* player): destroys the Pickup after collection.
+- GetExperienceValue(): exposes experience value to Player.
+
+
+LightRogue/Player.h
+LightRogue/Player.cpp
+
+Fixed the missing class declaration bug:
+
+- Added forward declarations for Enemy, Projectile, and Pickup.
+
+Added experience and simple level-up behavior:
+
+- AddExperience(float experience): adds experience and checks level-up.
+- GetExperience(): returns current experience.
+- GetLevel(): returns current level.
+- CheckLevelUp(): upgrades Player while experience is enough.
+
+Current level-up effect:
+
+- Level increases by 1.
+- Max HP increases by 10.
+- Current HP is restored to max HP.
+- Movement speed increases by 2.
+
+Collision handling now does useful work:
+
+- Player touching Enemy subtracts Enemy damage from Player HP.
+- Player touching Projectile subtracts Projectile damage from Player HP.
+- Player touching Pickup adds Pickup experience to Player.
+
+
+LightRogue/GameWorld.h
+LightRogue/GameWorld.cpp
+
+Added:
+
+- sf::Texture _pickupTexture
+
+This texture is stored as a GameWorld member so Pickup sprites keep referencing
+a valid texture after construction.
+
+Changed CleanUp():
+
+- When an Enemy is destroyed, GameWorld now directly constructs a Pickup:
+
+  auto pickup = std::make_unique<Pickup>(_pickupTexture, enemyExperience);
+  pickup->SetPosition(enemyPosition.x, enemyPosition.y);
+  _pickups.push_back(std::move(pickup));
+
+- This is done before erasing the Enemy, so the Enemy position and experience
+  value are still available.
+
+Changed Collision():
+
+- Friendly projectiles only collide with living enemies.
+- A projectile destroyed after hitting one enemy will not continue affecting
+  later enemies in the same frame.
+- Pickups only collide with Player while they still exist.
+
+
+LightRogue/Game.cpp
+
+Changed the main game loop to actually run collision and cleanup:
+
+1. UpdateAll(deltaTime)
+2. Collision()
+3. CleanUp()
+4. DrawAll(window)
+
+Before this change, Collision() and CleanUp() existed but were not called by
+the main loop, so collisions and object removal would not happen.
+
+
+LightRogue/GameObject.h
+
+Changed the destructor to:
+
+virtual ~GameObject();
+
+This is safer for a base class used by Player, Enemy, Projectile, and Pickup.
+
+
+LightRogue/stdafx.h
+
+Added standard library headers used by the current code:
+
+- <cmath>
+- <memory>
+- <optional>
+- <vector>
+
+
+Important notes
+---------------
+1. This version does not add a full event system yet. It keeps the current
+   direct collision handling style used by the project.
+
+2. This version follows the teammate discussion: no CreatePickup() helper is
+   used. Pickup objects are directly constructed and pushed into GameWorld
+   during CleanUp().
+
+3. Enemy spawning is not implemented here. Enemy behavior is ready, but the
+   game still needs an EnemySpawner or temporary Add(enemy) call to create
+   enemies during gameplay.
+
+4. Player::Shoot() is still a placeholder from the existing project. Projectile
+   creation should be connected by the projectile/core-framework module.
+
+5. The method name HandleCollison is kept as-is because the existing project
+   already uses this spelling. Renaming it to HandleCollision should be done as
+   a coordinated refactor later.

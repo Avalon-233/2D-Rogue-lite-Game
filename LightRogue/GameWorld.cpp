@@ -6,8 +6,37 @@
 #include "Projectile.h"
 #include "Pickup.h"
 
+namespace
+{
+	const sf::Vector2f GameAreaSize(1024.f, 768.f);
+	constexpr float EnemySpawnMargin = 40.f;
+
+	std::mt19937& GetRandomEngine()
+	{
+		static std::random_device seedGenerator;
+		static std::mt19937 engine(seedGenerator());
+		return engine;
+	}
+
+	float RandomFloat(float min, float max)
+	{
+		std::uniform_real_distribution<float> distribution(min, max);
+		return distribution(GetRandomEngine());
+	}
+
+	int RandomInt(int min, int max)
+	{
+		std::uniform_int_distribution<int> distribution(min, max);
+		return distribution(GetRandomEngine());
+	}
+}
+
 GameWorld::GameWorld()
 {
+	sf::Image pickupImage({ 16,16 }, sf::Color::Yellow);
+	assert(_pickupTexture.loadFromImage(pickupImage));
+	sf::Image enemyImage({ 32,32 }, sf::Color::Red);
+	assert(_enemyTexture.loadFromImage(enemyImage));
 }
 
 GameWorld::~GameWorld()
@@ -48,6 +77,7 @@ void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 void GameWorld::UpdateAll(float deltaTime)
 {
 	if(_player)_player->Update(deltaTime);
+	UpdateEnemySpawning(deltaTime);
 	for (auto& it :_enemies)
 		it->Update(deltaTime);
 	for (auto& it : _projectiles)
@@ -80,7 +110,7 @@ void GameWorld::Collision()
 		{
 			for(auto& itEnemy : _enemies)
 			{
-				if (it->GetBounds().findIntersection(itEnemy->GetBounds()))
+				if (it->IsExisting() && itEnemy->IsExisting() && it->GetBounds().findIntersection(itEnemy->GetBounds()))
 				{
 					it->HandleCollison(itEnemy.get());
 					itEnemy->HandleCollison(it.get());
@@ -91,7 +121,7 @@ void GameWorld::Collision()
 	//pickup vs player
 	for (auto& it : _pickups)
 	{
-		if (it->GetBounds().findIntersection(_player->GetBounds()))
+		if (it->IsExisting() && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
 			it->HandleCollison(_player.get());
 			_player->HandleCollison(it.get());
@@ -106,7 +136,13 @@ void GameWorld::CleanUp()
 	{
 		if ((*itEnemy)->IsExisting())
 			++itEnemy;
-		else itEnemy = _enemies.erase(itEnemy);
+		else
+		{
+			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue());
+			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
+			Add(std::move(pickup));
+			itEnemy = _enemies.erase(itEnemy);
+		}
 	}
 	auto itProjectile = _projectiles.begin();
 	while (itProjectile != _projectiles.end())
@@ -141,4 +177,52 @@ void GameWorld::CleanUp()
 	);
 	*/
 
+}
+
+void GameWorld::UpdateEnemySpawning(float deltaTime)
+{
+	if (!_player)
+		return;
+
+	_elapsedGameTime += deltaTime;
+	_enemySpawnTimer += deltaTime;
+
+	float currentSpawnInterval = std::max(_minEnemySpawnInterval, _baseEnemySpawnInterval - _elapsedGameTime * 0.03f);
+	if (_enemySpawnTimer < currentSpawnInterval)
+		return;
+
+	_enemySpawnTimer = 0.f;
+
+	std::size_t spawnCount = 1 + static_cast<std::size_t>(_elapsedGameTime / 30.f);
+	spawnCount = std::min<std::size_t>(spawnCount, 4);
+
+	for (std::size_t i = 0; i < spawnCount && _enemies.size() < _maxEnemyCount; ++i)
+	{
+		SpawnEnemy(GetRandomEnemySpawnPosition());
+	}
+}
+
+void GameWorld::SpawnEnemy(sf::Vector2f position)
+{
+	auto enemy = std::make_unique<Enemy>(_enemyTexture);
+	enemy->SetPosition(position.x, position.y);
+	enemy->SetTarget(_player.get());
+	_enemies.push_back(std::move(enemy));
+}
+
+sf::Vector2f GameWorld::GetRandomEnemySpawnPosition()const
+{
+	int side = RandomInt(0, 3);
+
+	switch (side)
+	{
+	case 0:
+		return { RandomFloat(-EnemySpawnMargin, GameAreaSize.x + EnemySpawnMargin), -EnemySpawnMargin };
+	case 1:
+		return { RandomFloat(-EnemySpawnMargin, GameAreaSize.x + EnemySpawnMargin), GameAreaSize.y + EnemySpawnMargin };
+	case 2:
+		return { -EnemySpawnMargin, RandomFloat(-EnemySpawnMargin, GameAreaSize.y + EnemySpawnMargin) };
+	default:
+		return { GameAreaSize.x + EnemySpawnMargin, RandomFloat(-EnemySpawnMargin, GameAreaSize.y + EnemySpawnMargin) };
+	}
 }

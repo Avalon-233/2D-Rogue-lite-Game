@@ -25,7 +25,7 @@ void Game::Start()
 	//Create a player
 	sf::Image image({ 32,32 }, sf::Color::Green);
 	sf::Texture playerTexture(image);
-	std::unique_ptr<Player> player = std::make_unique<Player>(playerTexture);
+	std::unique_ptr<Player> player = std::make_unique<Player>(playerTexture,&_gameWorld,&_mainWindow);
 	player->SetPosition(512.f, 384.f);
 	_gameWorld.Add(std::move(player));
 
@@ -49,7 +49,10 @@ void Game::GameLoop()
 		event->visit([](const auto& type) {HandleEvent(type);});
 	}
 
-	_gameWorld.UpdateAll(_clock.restart().asSeconds());
+	float deltaTime = _clock.restart().asSeconds();
+	_gameWorld.UpdateAll(deltaTime);
+	_gameWorld.Collision();
+	_gameWorld.CleanUp();
 
 	_mainWindow.clear();
 	_gameWorld.DrawAll(_mainWindow);
