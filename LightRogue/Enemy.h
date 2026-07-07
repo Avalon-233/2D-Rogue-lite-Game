@@ -11,8 +11,8 @@ public:
 	~Enemy();
 
 	void Update(float deltaTime)override;
-	void HandleCollison(Player* player);
-	void HandleCollison(Projectile* projectile);
+	void HandleCollision(Player* player);
+	void HandleCollision(Projectile* projectile);
 
 	void SetTarget(Player* player);
 

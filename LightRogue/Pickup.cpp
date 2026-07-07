@@ -13,7 +13,7 @@ Pickup::~Pickup()
 {
 }
 
-void Pickup::HandleCollison(Player* player)
+void Pickup::HandleCollision(Player* player)
 {
 	Destroy();
 }

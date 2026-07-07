@@ -28,11 +28,11 @@ void Enemy::Update(float deltaTime)
 	}
 }
 
-void Enemy::HandleCollison(Player* player)
+void Enemy::HandleCollision(Player* player)
 {
 }
 
-void Enemy::HandleCollison(Projectile* projectile)
+void Enemy::HandleCollision(Projectile* projectile)
 {
 	_HP -= projectile->GetDamage();
 	if (_HP <= 0.f)

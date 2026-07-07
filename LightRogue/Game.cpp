@@ -57,7 +57,6 @@ void Game::GameLoop()
 
 	_mainWindow.clear();
 	_gameWorld.DrawAll(_mainWindow);
-	_gameWorld.DrawUI(_mainWindow);
 	_mainWindow.display();
 }
 

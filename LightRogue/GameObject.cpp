@@ -18,7 +18,7 @@ void GameObject::Update(float deltaTime)
 {
 }
 
-void GameObject::HandleCollison(GameObject* gameObject)
+void GameObject::HandleCollision(GameObject* gameObject)
 {
 }
 

@@ -8,8 +8,8 @@ public:
 	~Projectile();
 
 	void Update(float deltaTime)override;
-	void HandleCollison(Player* player);
-	void HandleCollison(Enemy* enemy);
+	void HandleCollision(Player* player);
+	void HandleCollision(Enemy* enemy);
 
 	bool IsFriendly()const;
 	float GetDamage()const;

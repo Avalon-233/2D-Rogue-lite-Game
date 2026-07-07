@@ -22,12 +22,12 @@ void Projectile::Update(float deltaTime)
 	_sprite.move(_speed * deltaTime);
 }
 
-void Projectile::HandleCollison(Player* player)
+void Projectile::HandleCollision(Player* player)
 {
 	Destroy();
 }
 
-void Projectile::HandleCollison(Enemy* enemy)
+void Projectile::HandleCollision(Enemy* enemy)
 {
 	Destroy();
 }

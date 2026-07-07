@@ -54,19 +54,19 @@ void Player::Update(float deltaTime)
 	CheckLevelUp();
 }
 
-void Player::HandleCollison(Enemy* enemy)
+void Player::HandleCollision(Enemy* enemy)
 {
 	_HP -= enemy->GetDamage();
 }
 
-void Player::HandleCollison(Projectile* projectile)
+void Player::HandleCollision(Projectile* projectile)
 {
 	
 	_HP-= projectile->GetDamage();
 	
 }
 
-void Player::HandleCollison(Pickup* pickup)
+void Player::HandleCollision(Pickup* pickup)
 {
 	AddExperience(pickup->GetExperienceValue());
 }

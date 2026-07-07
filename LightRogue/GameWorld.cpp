@@ -47,6 +47,8 @@ void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 		it->Draw(renderWindow);
 	for (auto& it : _pickups)
 		it->Draw(renderWindow);
+
+	DrawUI(renderWindow);
 }
 
 void GameWorld::UpdateAll(float deltaTime)
@@ -69,8 +71,8 @@ void GameWorld::Collision()
 	{
 		if (it->IsExisting() && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
-			it->HandleCollison(_player.get());
-			_player->HandleCollison(it.get());
+			it->HandleCollision(_player.get());
+			_player->HandleCollision(it.get());
 		}
 	}
 	//projectile vs player/enemy
@@ -78,8 +80,8 @@ void GameWorld::Collision()
 	{
 		if (it->IsExisting() && (!it->IsFriendly()) && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
-			it->HandleCollison(_player.get());
-			_player->HandleCollison(it.get());
+			it->HandleCollision(_player.get());
+			_player->HandleCollision(it.get());
 		}
 		if (it->IsExisting() && it->IsFriendly())
 		{
@@ -87,8 +89,8 @@ void GameWorld::Collision()
 			{
 				if (it->IsExisting() && itEnemy->IsExisting() && it->GetBounds().findIntersection(itEnemy->GetBounds()))
 				{
-					it->HandleCollison(itEnemy.get());
-					itEnemy->HandleCollison(it.get());
+					it->HandleCollision(itEnemy.get());
+					itEnemy->HandleCollision(it.get());
 				}
 			}
 		}
@@ -98,8 +100,8 @@ void GameWorld::Collision()
 	{
 		if (it->IsExisting() && it->GetBounds().findIntersection(_player->GetBounds()))
 		{
-			it->HandleCollison(_player.get());
-			_player->HandleCollison(it.get());
+			it->HandleCollision(_player.get());
+			_player->HandleCollision(it.get());
 		}
 	}
 }

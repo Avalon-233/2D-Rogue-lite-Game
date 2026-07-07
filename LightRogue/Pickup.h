@@ -9,7 +9,7 @@ public:
 	Pickup(const sf::Texture& texture, float experienceValue);
 	~Pickup();
 
-	void HandleCollison(Player* player);
+	void HandleCollision(Player* player);
 
 	float GetExperienceValue()const;
 

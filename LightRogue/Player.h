@@ -13,9 +13,9 @@ public:
 	~Player();
 
 	void Update(float deltaTime)override;
-	void HandleCollison(Enemy* enemy);
-	void HandleCollison(Projectile* projectile);
-	void HandleCollison(Pickup* pickup);
+	void HandleCollision(Enemy* enemy);
+	void HandleCollision(Projectile* projectile);
+	void HandleCollision(Pickup* pickup);
 
 	void Shoot(sf::Vector2i position);
 	void AddExperience(float experience);
