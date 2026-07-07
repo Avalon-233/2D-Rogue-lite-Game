@@ -97,9 +97,19 @@ float Player::GetHP()const
 	return _HP;
 }
 
+float Player::GetMaxHP()const
+{
+	return _maxHP;
+}
+
 float Player::GetExperience()const
 {
 	return _experience;
+}
+
+float Player::GetExperienceNeeded()const
+{
+	return _level * 10.f;
 }
 
 int Player::GetLevel()const
@@ -117,6 +127,8 @@ void Player::CheckLevelUp()
 		_maxHP += 10.f;
 		_HP = _maxHP;
 		_speed += 2.f;
+		_shootDamage += 5.f;
+		if(_shootCooldown>0.05f)_shootCooldown-=0.05f;
 		experienceNeeded = _level * 10.f;
 	}
 }

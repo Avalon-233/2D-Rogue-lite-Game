@@ -1,5 +1,6 @@
 #pragma once
 #include"GameObject.h"
+#include"UI.h"
 
 class Player;
 class Enemy;
@@ -24,21 +25,27 @@ public:
 
 	void CleanUp();
 
-private:
-	void UpdateEnemySpawning(float deltaTime);
-	void SpawnEnemy(sf::Vector2f position);
-	sf::Vector2f GetRandomEnemySpawnPosition()const;
+	void DrawUI(sf::RenderWindow& renderWindow);
 
+private:
+	
+	sf::Vector2f GetRandomSpawnPosition()const;
+	void UpdateSpawning(float deltaTime);
+	
 	std::unique_ptr<Player> _player;
 	std::vector<std::unique_ptr<Enemy>> _enemies;
 	std::vector<std::unique_ptr<Projectile>> _projectiles;
 	std::vector<std::unique_ptr<Pickup>> _pickups;
 	sf::Texture _pickupTexture;
 	sf::Texture _enemyTexture;
-	float _elapsedGameTime = 0.f;
-	float _enemySpawnTimer = 0.f;
-	float _baseEnemySpawnInterval = 2.5f;
-	float _minEnemySpawnInterval = 0.45f;
-	std::size_t _maxEnemyCount = 50;
+
+	float _gameTime = 0.f;
+	float _spawnTimer = 0.f;
+	const int MAX_ENEMIES_COUNT = 50;
+	float _minInterval = 0.45f;
+	float _baseInterval = 2.5f;
+	float _decayRate = 0.03f;
+
+	UIManager _uiManager;
 	
 };
