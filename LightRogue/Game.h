@@ -16,7 +16,7 @@ private:
 	static bool IsExiting();
 	static void GameLoop();
 
-	enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exiting, GameOver，Upgrading };
+	enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exiting, GameOver, Upgrading };
 
 	static GameState _gameState;
 	static sf::RenderWindow _mainWindow;
@@ -24,5 +24,7 @@ private:
 	static GameWorld _gameWorld;
 
 	static void HandleEvent(const sf::Event::Closed&);
+	static void HandleEvent(const sf::Event::KeyPressed& event);
 	static void HandleEvent(const sf::Event&);
+	static void UpdateWindowTitle();
 };

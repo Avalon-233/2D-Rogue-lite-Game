@@ -7,9 +7,43 @@ void Game::HandleEvent(const sf::Event::Closed&)
 	_gameState = Exiting;
 }
 
+void Game::HandleEvent(const sf::Event::KeyPressed& event)
+{
+	if (event.code == sf::Keyboard::Key::Escape)
+	{
+		if (_gameState == Playing)
+			_gameState = Paused;
+		else if (_gameState == Paused)
+			_gameState = Playing;
+		else if (_gameState == ShowingSplash || _gameState == GameOver)
+			_gameState = Exiting;
+		return;
+	}
+
+	if (event.code == sf::Keyboard::Key::Enter)
+	{
+		if (_gameState == ShowingSplash)
+			_gameState = Playing;
+		else if (_gameState == GameOver)
+			_gameState = Exiting;
+		return;
+	}
+
+	if (_gameState == Upgrading)
+	{
+		if (event.code == sf::Keyboard::Key::Num1 || event.code == sf::Keyboard::Key::Numpad1)
+			_gameWorld.ApplyUpgradeOption(1);
+		else if (event.code == sf::Keyboard::Key::Num2 || event.code == sf::Keyboard::Key::Numpad2)
+			_gameWorld.ApplyUpgradeOption(2);
+		else if (event.code == sf::Keyboard::Key::Num3 || event.code == sf::Keyboard::Key::Numpad3)
+			_gameWorld.ApplyUpgradeOption(3);
+
+		if (!_gameWorld.HasPendingUpgrade())
+			_gameState = Playing;
+	}
+}
+
 void Game::HandleEvent(const sf::Event&) {}//other events
-
-
 
 void Game::Start()
 {
@@ -17,7 +51,7 @@ void Game::Start()
 		return;
 
 	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "LightRogue");
-	_gameState = Game::Playing;
+	_gameState = Game::ShowingSplash;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
 	_clock.restart();
@@ -50,14 +84,50 @@ void Game::GameLoop()
 	}
 
 	float deltaTime = _clock.restart().asSeconds();
-	if (deltaTime>0.1f) deltaTime = 0.1f;
-	_gameWorld.UpdateAll(deltaTime);
-	_gameWorld.Collision();
-	_gameWorld.CleanUp();
+	if (deltaTime > 0.1f) deltaTime = 0.1f;
+
+	if (_gameState == Playing)
+	{
+		_gameWorld.UpdateAll(deltaTime);
+		_gameWorld.Collision();
+		_gameWorld.CleanUp();
+
+		if (_gameWorld.IsPlayerDead() || _gameWorld.IsTimeUp())
+			_gameState = GameOver;
+		else if (_gameWorld.HasPendingUpgrade())
+			_gameState = Upgrading;
+	}
 
 	_mainWindow.clear();
-	_gameWorld.DrawAll(_mainWindow);
+	if (_gameState != ShowingSplash)
+		_gameWorld.DrawAll(_mainWindow);
+	UpdateWindowTitle();
 	_mainWindow.display();
+}
+
+void Game::UpdateWindowTitle()
+{
+	switch (_gameState)
+	{
+	case ShowingSplash:
+		_mainWindow.setTitle("LightRogue - Press Enter to start");
+		break;
+	case Playing:
+		_mainWindow.setTitle("LightRogue - Playing | Esc: pause");
+		break;
+	case Paused:
+		_mainWindow.setTitle("LightRogue - Paused | Esc: resume");
+		break;
+	case Upgrading:
+		_mainWindow.setTitle("LightRogue - Upgrade | " + _gameWorld.GetUpgradePrompt());
+		break;
+	case GameOver:
+		_mainWindow.setTitle("LightRogue - Game Over | Enter/Esc: exit");
+		break;
+	default:
+		_mainWindow.setTitle("LightRogue");
+		break;
+	}
 }
 
 Game::GameState Game::_gameState = Uninitialized;

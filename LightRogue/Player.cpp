@@ -8,7 +8,7 @@
 Player::Player(const sf::Texture& texture,GameWorld* gameWorld, sf::RenderWindow* mainWindow) :GameObject(texture),_gameWorld(gameWorld),_mainWindow(mainWindow)
 {
 	_sprite.setOrigin(_sprite.getGlobalBounds().size/2.f);
-	sf::Image projectileImage({ 16,16 }, sf::Color::Red);
+	sf::Image projectileImage({ 16,16 }, sf::Color::Cyan);
 	assert(_projectileTexture.loadFromImage(projectileImage));
 }
 
@@ -50,8 +50,6 @@ void Player::Update(float deltaTime)
 			_shootTimer=0.f;
 		}
 	}
-	//level up
-	CheckLevelUp();
 }
 
 void Player::HandleCollision(Enemy* enemy)
@@ -77,8 +75,23 @@ void Player::Shoot(sf::Vector2i position)
 	sf::Vector2f distance = { position.x*1.f - GetPosition().x,position.y*1.f - GetPosition().y };
 	if (distance.x ==0.&&distance.y== 0.f)return;
 	sf::Vector2f direction = distance.normalized();
-	auto projectile = std::make_unique<Projectile>(_projectileTexture, GetPosition(), direction * _shootSpeed, _shootDamage, true);
-	_gameWorld->Add(std::move(projectile));
+	if (_projectileCount <= 1)
+	{
+		FireProjectile(direction);
+		return;
+	}
+
+	float spreadStep = 10.f * 3.1415926f / 180.f;
+	float startAngle = -spreadStep * static_cast<float>(_projectileCount - 1) / 2.f;
+	for (int i = 0; i < _projectileCount; ++i)
+	{
+		float angle = startAngle + spreadStep * static_cast<float>(i);
+		sf::Vector2f spreadDirection(
+			direction.x * std::cos(angle) - direction.y * std::sin(angle),
+			direction.x * std::sin(angle) + direction.y * std::cos(angle)
+		);
+		FireProjectile(spreadDirection);
+	}
 }
 
 void Player::AddExperience(float experience)
@@ -109,7 +122,7 @@ float Player::GetExperience()const
 
 float Player::GetExperienceNeeded()const
 {
-	return _level * 10.f;
+	return _level * 10.f * _experienceNeedMultiplier;
 }
 
 int Player::GetLevel()const
@@ -117,18 +130,107 @@ int Player::GetLevel()const
 	return _level;
 }
 
+bool Player::HasPendingUpgrade()const
+{
+	return _pendingUpgradeCount > 0;
+}
+
+void Player::ApplyUpgradeOption(int option)
+{
+	if (_pendingUpgradeCount <= 0)
+		return;
+	if (option < 1 || option > 3)
+		return;
+
+	ApplyUpgradeType(static_cast<UpgradeType>(_currentUpgradeOptions[option - 1]));
+	_pendingUpgradeCount--;
+
+	if (_pendingUpgradeCount > 0)
+		RollUpgradeOptions();
+}
+
+const std::array<int, 3>& Player::GetCurrentUpgradeOptions()const
+{
+	return _currentUpgradeOptions;
+}
+
 void Player::CheckLevelUp()
 {
-	float experienceNeeded = _level * 10.f;
+	float experienceNeeded = GetExperienceNeeded();
 	while (_experience >= experienceNeeded)
 	{
 		_experience -= experienceNeeded;
 		_level++;
-		_maxHP += 10.f;
-		_HP = _maxHP;
-		_speed += 2.f;
+		if (_pendingUpgradeCount == 0)
+			RollUpgradeOptions();
+		_pendingUpgradeCount++;
+		experienceNeeded = GetExperienceNeeded();
+	}
+}
+
+void Player::FireProjectile(sf::Vector2f direction)
+{
+	auto projectile = std::make_unique<Projectile>(_projectileTexture, GetPosition(), direction * _shootSpeed, _shootDamage, true);
+	_gameWorld->Add(std::move(projectile));
+}
+
+void Player::RollUpgradeOptions()
+{
+	std::vector<int> upgradePool{
+		ExtraProjectile,
+		DamageUp,
+		FireRateUp,
+		ProjectileSpeedUp,
+		MoveSpeedUp,
+		MaxHPUp,
+		HealUp,
+		ExperienceNeedDown
+	};
+
+	for (std::size_t i = 0; i < _currentUpgradeOptions.size(); ++i)
+	{
+		int index = rand() % static_cast<int>(upgradePool.size());
+		_currentUpgradeOptions[i] = upgradePool[index];
+		upgradePool.erase(upgradePool.begin() + index);
+	}
+}
+
+void Player::ApplyUpgradeType(UpgradeType upgradeType)
+{
+	switch (upgradeType)
+	{
+	case ExtraProjectile:
+		_projectileCount++;
+		break;
+	case DamageUp:
 		_shootDamage += 5.f;
-		if(_shootCooldown>0.05f)_shootCooldown-=0.05f;
-		experienceNeeded = _level * 10.f;
+		break;
+	case FireRateUp:
+		if (_shootCooldown > 0.12f)
+			_shootCooldown -= 0.08f;
+		break;
+	case ProjectileSpeedUp:
+		_shootSpeed += 80.f;
+		break;
+	case MoveSpeedUp:
+		_speed += 20.f;
+		break;
+	case MaxHPUp:
+		_maxHP += 20.f;
+		_HP += 20.f;
+		if (_HP > _maxHP)
+			_HP = _maxHP;
+		break;
+	case HealUp:
+		_HP += 35.f;
+		if (_HP > _maxHP)
+			_HP = _maxHP;
+		break;
+	case ExperienceNeedDown:
+		if (_experienceNeedMultiplier > 0.55f)
+			_experienceNeedMultiplier -= 0.1f;
+		break;
+	default:
+		break;
 	}
 }

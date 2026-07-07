@@ -2,6 +2,8 @@
 #include"GameObject.h"
 #include"UI.h"
 
+#include <string>
+
 class Player;
 class Enemy;
 class Projectile;
@@ -26,6 +28,12 @@ public:
 	void CleanUp();
 
 	void DrawUI(sf::RenderWindow& renderWindow);
+	bool IsPlayerDead()const;
+	bool IsTimeUp()const;
+	bool HasPendingUpgrade()const;
+	void ApplyUpgradeOption(int option);
+	float GetGameTime()const;
+	std::string GetUpgradePrompt()const;
 
 private:
 	
@@ -45,6 +53,7 @@ private:
 	float _minInterval = 0.45f;
 	float _baseInterval = 2.5f;
 	float _decayRate = 0.03f;
+	float _gameTimeLimit = 360.f;
 
 	UIManager _uiManager;
 	

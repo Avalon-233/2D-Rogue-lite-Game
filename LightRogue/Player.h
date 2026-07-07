@@ -2,6 +2,8 @@
 #include"GameObject.h"
 #include"GameWorld.h"
 
+#include <array>
+
 class Enemy;
 class Projectile;
 class Pickup;
@@ -26,8 +28,22 @@ public:
 	float GetExperience()const;
 	float GetExperienceNeeded()const;
 	int GetLevel()const;
+	bool HasPendingUpgrade()const;
+	void ApplyUpgradeOption(int option);
+	const std::array<int, 3>& GetCurrentUpgradeOptions()const;
 
 private:
+	enum UpgradeType
+	{
+		ExtraProjectile = 1,
+		DamageUp,
+		FireRateUp,
+		ProjectileSpeedUp,
+		MoveSpeedUp,
+		MaxHPUp,
+		HealUp,
+		ExperienceNeedDown
+	};
 
 	sf::RenderWindow* _mainWindow;
 	GameWorld* _gameWorld ;
@@ -41,12 +57,19 @@ private:
 	float _shootTimer=0.f;
 	float _shootDamage=10.f;
 	float _shootSpeed=500.f;
+	int _projectileCount=1;
 	sf::Texture _projectileTexture;
 	//levevl-about
 	float _experience=0.f;
+	float _experienceNeedMultiplier=1.f;
 	int _level=1;
+	int _pendingUpgradeCount=0;
+	std::array<int, 3> _currentUpgradeOptions{ ExtraProjectile, DamageUp, FireRateUp };
 	//other
 
 	void CheckLevelUp();
+	void FireProjectile(sf::Vector2f direction);
+	void RollUpgradeOptions();
+	void ApplyUpgradeType(UpgradeType upgradeType);
 
 };

@@ -182,12 +182,13 @@ sf::Vector2f GameWorld::GetRandomSpawnPosition()const
 	int side = rand() % 4;
 	switch (side)
 	{
-	case 0: return { static_cast<float>(rand()%(int)w), -margin };          // 上
-	case 1: return { static_cast<float>(rand()%(int)w), h+margin };       // 下
-	case 2: return { -margin, static_cast<float>(rand()%(int)h) };          // 左
-	case 3: return { w+margin, static_cast<float>(rand()%(int)h) };       // 右
+	case 0: return { static_cast<float>(rand()%(int)w), -margin };       // top
+	case 1: return { static_cast<float>(rand()%(int)w), h+margin };      // bottom
+	case 2: return { -margin, static_cast<float>(rand()%(int)h) };       // left
+	case 3: return { w+margin, static_cast<float>(rand()%(int)h) };      // right
 	}
 
+	return { w + margin, h / 2.f };
 }
 
 void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
@@ -198,4 +199,57 @@ void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
 	{
 		_uiManager.DrawEnemyHealthBar(renderWindow, enemy.get());
 	}
+}
+
+bool GameWorld::IsPlayerDead()const
+{
+	return _player && !_player->IsExisting();
+}
+
+bool GameWorld::IsTimeUp()const
+{
+	return _gameTime >= _gameTimeLimit;
+}
+
+bool GameWorld::HasPendingUpgrade()const
+{
+	return _player && _player->HasPendingUpgrade();
+}
+
+void GameWorld::ApplyUpgradeOption(int option)
+{
+	if (_player)
+		_player->ApplyUpgradeOption(option);
+}
+
+float GameWorld::GetGameTime()const
+{
+	return _gameTime;
+}
+
+std::string GameWorld::GetUpgradePrompt()const
+{
+	if (!_player)
+		return "";
+
+	const auto& options = _player->GetCurrentUpgradeOptions();
+	auto getName = [](int option)
+	{
+		switch (option)
+		{
+		case 1: return "extra bullet";
+		case 2: return "damage";
+		case 3: return "fire rate";
+		case 4: return "bullet speed";
+		case 5: return "move speed";
+		case 6: return "max HP";
+		case 7: return "heal";
+		case 8: return "less XP need";
+		default: return "unknown";
+		}
+	};
+
+	return "1: " + std::string(getName(options[0])) +
+		"  2: " + std::string(getName(options[1])) +
+		"  3: " + std::string(getName(options[2]));
 }
