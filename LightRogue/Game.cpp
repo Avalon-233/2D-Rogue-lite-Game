@@ -50,12 +50,14 @@ void Game::GameLoop()
 	}
 
 	float deltaTime = _clock.restart().asSeconds();
+	if (deltaTime>0.1f) deltaTime = 0.1f;
 	_gameWorld.UpdateAll(deltaTime);
 	_gameWorld.Collision();
 	_gameWorld.CleanUp();
 
 	_mainWindow.clear();
 	_gameWorld.DrawAll(_mainWindow);
+	_gameWorld.DrawUI(_mainWindow);
 	_mainWindow.display();
 }
 

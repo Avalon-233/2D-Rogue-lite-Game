@@ -77,7 +77,8 @@ void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 void GameWorld::UpdateAll(float deltaTime)
 {
 	if(_player)_player->Update(deltaTime);
-	UpdateEnemySpawning(deltaTime);
+	//UpdateEnemySpawning(deltaTime);
+	UpdateSpawning(deltaTime);
 	for (auto& it :_enemies)
 		it->Update(deltaTime);
 	for (auto& it : _projectiles)
@@ -179,6 +180,40 @@ void GameWorld::CleanUp()
 
 }
 
+void GameWorld::UpdateSpawning(float deltaTime)
+{
+	_gameTime += deltaTime;
+	_spawnTimer += deltaTime;
+	float interval = std::max(0.45f, 2.5f - _gameTime * 0.03f);
+	if (_spawnTimer < interval)
+		return;
+	if (_enemies.size() < MAX_ENEMIES_COUNT)
+	{
+		auto enemy = std::make_unique<Enemy>(_enemyTexture);
+		auto position = GetRandomEnemySpawnPosition();
+		enemy->SetPosition(position.x,position.y);
+		enemy->SetTarget(_player.get());
+		Add(std::move(enemy));
+		_spawnTimer = 0.f;
+	}
+}
+
+sf::Vector2f GameWorld::GetRandomEnemySpawnPosition()const
+{
+	const float margin = 40.f;
+	const float w = 1024.f, h = 768.f;
+
+	int side = rand() % 4;
+	switch (side)
+	{
+	case 0: return { static_cast<float>(rand()%(int)w), -margin };          // 上
+	case 1: return { static_cast<float>(rand()%(int)w), h+margin };       // 下
+	case 2: return { -margin, static_cast<float>(rand()%(int)h) };          // 左
+	case 3: return { w+margin, static_cast<float>(rand()%(int)h) };       // 右
+	}
+
+}
+/*
 void GameWorld::UpdateEnemySpawning(float deltaTime)
 {
 	if (!_player)
@@ -224,5 +259,15 @@ sf::Vector2f GameWorld::GetRandomEnemySpawnPosition()const
 		return { -EnemySpawnMargin, RandomFloat(-EnemySpawnMargin, GameAreaSize.y + EnemySpawnMargin) };
 	default:
 		return { GameAreaSize.x + EnemySpawnMargin, RandomFloat(-EnemySpawnMargin, GameAreaSize.y + EnemySpawnMargin) };
+	}
+}
+*/
+void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
+{
+	_uiManager.DrawPlayerHUD(renderWindow, _player.get());
+
+	for (auto& enemy : _enemies)
+	{
+		_uiManager.DrawEnemyHealthBar(renderWindow, enemy.get());
 	}
 }

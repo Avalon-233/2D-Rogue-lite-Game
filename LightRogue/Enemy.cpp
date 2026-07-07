@@ -44,6 +44,16 @@ void Enemy::SetTarget(Player* player)
 	_target = player;
 }
 
+float Enemy::GetHP()const
+{
+	return _HP;
+}
+
+float Enemy::GetMaxHP()const
+{
+	return _maxHP;
+}
+
 float Enemy::GetDamage()const
 {
 	return _damage;

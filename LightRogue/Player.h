@@ -22,7 +22,9 @@ public:
 
 	float GetSpeed()const;
 	float GetHP()const;
+	float GetMaxHP()const;
 	float GetExperience()const;
+	float GetExperienceNeeded()const;
 	int GetLevel()const;
 
 private:
@@ -33,7 +35,7 @@ private:
 	//basic
 	float _HP=100;
 	float _maxHP=100;
-	float _speed=10;
+	float _speed=100;
 	//shoot-about
 	float _shootCooldown=0.5f;
 	float _shootTimer=0.f;
