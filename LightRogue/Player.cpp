@@ -5,9 +5,11 @@
 #include"Projectile.h"
 #include"Pickup.h"
 
-Player::Player(const sf::Texture& texture) :GameObject(texture)
+Player::Player(const sf::Texture& texture,GameWorld* gameWorld, sf::RenderWindow* mainWindow) :GameObject(texture),_gameWorld(gameWorld),_mainWindow(mainWindow)
 {
 	_sprite.setOrigin(_sprite.getGlobalBounds().size/2.f);
+	sf::Image projectileImage({ 16,16 }, sf::Color::Red);
+	assert(_projectileTexture.loadFromImage(projectileImage));
 }
 
 Player::~Player()
@@ -44,7 +46,7 @@ void Player::Update(float deltaTime)
 	{
 		if (_shootTimer >= _shootCooldown)
 		{
-			Shoot();
+			Shoot(sf::Mouse::getPosition(*_mainWindow));
 			_shootTimer=0.f;
 		}
 	}
@@ -69,9 +71,14 @@ void Player::HandleCollison(Pickup* pickup)
 	AddExperience(pickup->GetExperienceValue());
 }
 
-void Player::Shoot()
+void Player::Shoot(sf::Vector2i position)
 {
 	//create a projectile and Add() it
+	sf::Vector2f distance = { position.x*1.f - GetPosition().x,position.y*1.f - GetPosition().y };
+	if (distance.x ==0.&&distance.y== 0.f)return;
+	sf::Vector2f direction = distance.normalized();
+	auto projectile = std::make_unique<Projectile>(_projectileTexture, GetPosition(), direction * _shootSpeed, _shootDamage, true);
+	_gameWorld->Add(std::move(projectile));
 }
 
 void Player::AddExperience(float experience)

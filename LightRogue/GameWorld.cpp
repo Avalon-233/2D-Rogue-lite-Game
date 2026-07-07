@@ -112,7 +112,7 @@ void GameWorld::CleanUp()
 		{
 			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue());
 			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
-			_pickups.push_back(std::move(pickup));
+			Add(std::move(pickup));
 			itEnemy = _enemies.erase(itEnemy);
 		}
 	}
