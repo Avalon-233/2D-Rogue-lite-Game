@@ -10,6 +10,7 @@ public:
 	Enemy(const sf::Texture& texture);
 	~Enemy();
 
+	bool IsVisible()override;
 	void Update(float deltaTime)override;
 	void HandleCollision(Player* player);
 	void HandleCollision(Projectile* projectile);
@@ -29,4 +30,9 @@ private:
 	float _speed = 60.f;
 	float _experienceValue = 5.f;
 
+	bool _isShooted=false;
+
+	bool IsViSible();
+
+	sf::Clock _visibleTimer;
 };

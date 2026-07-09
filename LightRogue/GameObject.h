@@ -13,6 +13,7 @@ public:
 	GameObject(const sf::Texture& texture);
 	virtual ~GameObject();
 
+	virtual bool IsVisible();
 	virtual void Draw(sf::RenderWindow& window);
 	virtual void Update(float deltaTime);
 	virtual void HandleCollision(GameObject* gameObject);
@@ -30,5 +31,4 @@ protected:
 private:
 	sf::Vector2f _position{};
 	bool _isExisting = true;
-
 };

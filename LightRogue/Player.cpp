@@ -8,7 +8,7 @@
 Player::Player(const sf::Texture& texture,GameWorld* gameWorld, sf::RenderWindow* mainWindow) :GameObject(texture),_gameWorld(gameWorld),_mainWindow(mainWindow)
 {
 	_sprite.setOrigin(_sprite.getGlobalBounds().size/2.f);
-	sf::Image projectileImage({ 16,16 }, sf::Color::Cyan);
+	sf::Image projectileImage({ 8,8 }, sf::Color::Cyan);
 	assert(_projectileTexture.loadFromImage(projectileImage));
 }
 
@@ -98,6 +98,11 @@ void Player::AddExperience(float experience)
 {
 	_experience += experience;
 	CheckLevelUp();
+}
+
+float Player::GetVision()const
+{
+	return _visionRadius;
 }
 
 float Player::GetSpeed()const

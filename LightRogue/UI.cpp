@@ -85,12 +85,12 @@ UIManager::UIManager()
         sf::Color(40, 40, 40),
         sf::Color(80, 150, 255)
     );
-
+    /*
     _enemyHealthBar.SetSize(42.f, 6.f);
     _enemyHealthBar.SetColors(
         sf::Color(30, 30, 30),
         sf::Color(230, 60, 60)
-    );
+    );*/
 }
 
 void UIManager::DrawPlayerHUD(sf::RenderWindow& window, const Player* player)
@@ -108,7 +108,7 @@ void UIManager::DrawPlayerHUD(sf::RenderWindow& window, const Player* player)
     _playerExperienceBar.SetValue(player->GetExperience(), player->GetExperienceNeeded());
     _playerExperienceBar.Draw(window);
 }
-
+/*
 void UIManager::DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy)
 {
     if (!enemy)
@@ -132,7 +132,7 @@ void UIManager::DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy)
     _enemyHealthBar.SetPosition(x, y);
     _enemyHealthBar.SetValue(enemy->GetHP(), enemy->GetMaxHP());
     _enemyHealthBar.Draw(window);
-}
+}*/
 
 void UIManager::DrawUpgradeChoices(sf::RenderWindow& window, const Player* player)
 {

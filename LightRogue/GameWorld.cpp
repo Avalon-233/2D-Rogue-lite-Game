@@ -194,11 +194,11 @@ sf::Vector2f GameWorld::GetRandomSpawnPosition()const
 void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
 {
 	_uiManager.DrawPlayerHUD(renderWindow, _player.get());
-
+	/*
 	for (auto& enemy : _enemies)
 	{
 		_uiManager.DrawEnemyHealthBar(renderWindow, enemy.get());
-	}
+	}*/
 }
 
 void GameWorld::DrawUpgradeUI(sf::RenderWindow& renderWindow)

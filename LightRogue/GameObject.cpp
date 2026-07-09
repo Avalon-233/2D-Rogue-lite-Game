@@ -9,9 +9,14 @@ GameObject::~GameObject()
 {
 }
 
+bool GameObject::IsVisible()
+{
+	return true;
+}
+
 void GameObject::Draw(sf::RenderWindow& renderWindow)
 {
-	renderWindow.draw(_sprite);
+	if(IsVisible())renderWindow.draw(_sprite);
 }
 
 void GameObject::Update(float deltaTime)

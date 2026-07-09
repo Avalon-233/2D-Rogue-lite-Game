@@ -26,6 +26,12 @@ void Enemy::Update(float deltaTime)
 		direction /= length;
 		_sprite.move(direction * _speed * deltaTime);
 	}
+
+	if (_visibleTimer.getElapsedTime().asSeconds() > 1.f)
+	{
+		_isShooted = false;
+		_visibleTimer.stop();
+	}
 }
 
 void Enemy::HandleCollision(Player* player)
@@ -34,6 +40,8 @@ void Enemy::HandleCollision(Player* player)
 
 void Enemy::HandleCollision(Projectile* projectile)
 {
+	_isShooted = true;
+	_visibleTimer.restart();
 	_HP -= projectile->GetDamage();
 	if (_HP <= 0.f)
 		Destroy();
@@ -62,4 +70,12 @@ float Enemy::GetDamage()const
 float Enemy::GetExperienceValue()const
 {
 	return _experienceValue;
+}
+
+bool Enemy::IsVisible()
+{
+	auto distance = _target->GetPosition() - GetPosition();
+	if (std::sqrt(distance.x * distance.x + distance.y * distance.y) <= _target->GetVision())return true;
+	else if (_isShooted)return true;
+	else return false;
 }

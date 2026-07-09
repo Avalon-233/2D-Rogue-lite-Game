@@ -22,6 +22,7 @@ public:
 	void Shoot(sf::Vector2i position);
 	void AddExperience(float experience);
 
+	float GetVision()const;
 	float GetSpeed()const;
 	float GetHP()const;
 	float GetMaxHP()const;
@@ -65,11 +66,12 @@ private:
 	int _level=1;
 	int _pendingUpgradeCount=0;
 	std::array<int, 3> _currentUpgradeOptions{ ExtraProjectile, DamageUp, FireRateUp };
-	//other
-
+	
 	void CheckLevelUp();
 	void FireProjectile(sf::Vector2f direction);
 	void RollUpgradeOptions();
 	void ApplyUpgradeType(UpgradeType upgradeType);
 
+	//vision about
+	float _visionRadius = 300.f;
 };

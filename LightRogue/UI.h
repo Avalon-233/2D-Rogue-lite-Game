@@ -33,7 +33,7 @@ public:
     UIManager();
 
     void DrawPlayerHUD(sf::RenderWindow& window, const Player* player);
-    void DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy);
+    //void DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy);
     void DrawUpgradeChoices(sf::RenderWindow& window, const Player* player);
 
 private:
@@ -45,7 +45,7 @@ private:
 
     StatusBar _playerHealthBar;
     StatusBar _playerExperienceBar;
-    StatusBar _enemyHealthBar;
+    //StatusBar _enemyHealthBar;
     sf::Font _font;
     bool _fontLoaded = false;
 };
