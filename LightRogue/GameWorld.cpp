@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "Projectile.h"
 #include "Pickup.h"
+#include"Game.h"
 
 GameWorld::GameWorld()
 {
@@ -115,6 +116,7 @@ void GameWorld::CleanUp()
 			++itEnemy;
 		else
 		{
+			Game::GetEventManager().Emit(EnemyKilled{});
 			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue());
 			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
 			Add(std::move(pickup));

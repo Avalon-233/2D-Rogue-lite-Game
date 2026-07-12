@@ -55,12 +55,14 @@ void Player::Update(float deltaTime)
 void Player::HandleCollision(Enemy* enemy)
 {
 	_HP -= enemy->GetDamage();
+	Game::GetEventManager().Emit(PlayerDamaged{});
 }
 
 void Player::HandleCollision(Projectile* projectile)
 {
 	
 	_HP-= projectile->GetDamage();
+	Game::GetEventManager().Emit(PlayerDamaged{});
 	
 }
 
@@ -170,6 +172,7 @@ void Player::CheckLevelUp()
 			RollUpgradeOptions();
 		_pendingUpgradeCount++;
 		experienceNeeded = GetExperienceNeeded();
+		Game::GetEventManager().Emit(LevelUp{ _level});
 	}
 }
 

@@ -4,46 +4,92 @@
 
 void Game::HandleEvent(const sf::Event::Closed&)
 {
-	_gameState = Exiting;
+	_eventManager.Emit(GameStateChange{ Exiting });
+}
+
+void Game::HandleEvent(const sf::Event::MouseButtonPressed& event)
+{
+	if(event.button==sf::Mouse::Button::Left)
+	    _eventManager.Emit(MouseClicked{event.position.x,event.position.y,_gameState});
 }
 
 void Game::HandleEvent(const sf::Event::KeyPressed& event)
 {
-	if (event.code == sf::Keyboard::Key::Escape)
+	if (_gameState == Playing)
 	{
-		if (_gameState == Playing)
-			_gameState = Paused;
-		else if (_gameState == Paused)
-			_gameState = Playing;
-		else if (_gameState == ShowingSplash || _gameState == GameOver)
-			_gameState = Exiting;
-		return;
+		if(event.code==sf::Keyboard::Key::Escape)
+			_eventManager.Emit(GameStateChange{ Paused });
 	}
 
-	if (event.code == sf::Keyboard::Key::Enter)
+	else if (_gameState == Paused)
 	{
-		if (_gameState == ShowingSplash)
-			_gameState = Playing;
-		else if (_gameState == GameOver)
-			_gameState = Exiting;
-		return;
+		if (event.code == sf::Keyboard::Key::Escape)
+			_eventManager.Emit(GameStateChange{Playing});
 	}
 
-	if (_gameState == Upgrading)
+	else if (_gameState == GameOver)
+	{
+		_eventManager.Emit(GameStateChange{ Exiting });
+	}
+
+	else if (_gameState == ShowingSplash)
+	{
+		if(event.code == sf::Keyboard::Key::Escape)
+			_eventManager.Emit(GameStateChange{ Exiting });
+		else 
+			_eventManager.Emit(GameStateChange{ Playing });
+	}
+
+	else if (_gameState == Upgrading)
 	{
 		if (event.code == sf::Keyboard::Key::Num1 || event.code == sf::Keyboard::Key::Numpad1)
-			_gameWorld.ApplyUpgradeOption(1);
+			_eventManager.Emit(UpgradeSelected{ 1 });
 		else if (event.code == sf::Keyboard::Key::Num2 || event.code == sf::Keyboard::Key::Numpad2)
-			_gameWorld.ApplyUpgradeOption(2);
+			_eventManager.Emit(UpgradeSelected{ 2 });
 		else if (event.code == sf::Keyboard::Key::Num3 || event.code == sf::Keyboard::Key::Numpad3)
-			_gameWorld.ApplyUpgradeOption(3);
+			_eventManager.Emit(UpgradeSelected{ 3 });
 
-		if (!_gameWorld.HasPendingUpgrade())
-			_gameState = Playing;
 	}
 }
 
 void Game::HandleEvent(const sf::Event&) {}//other events
+
+void Game::ProcessEvents()
+{
+	_eventManager.Process([](const auto& event)
+		{
+			using T = std::decay_t<decltype(event)>;
+
+			if constexpr (std::is_same_v<T, GameStateChange>)
+			{
+				_gameState = event.gameState;
+			}
+			else if constexpr (std::is_same_v<T, LevelUp>)
+			{
+				if (_gameWorld.HasPendingUpgrade())
+					_eventManager.Emit(GameStateChange{ Upgrading });
+			}
+			else if constexpr (std::is_same_v<T, UpgradeSelected>)
+			{
+				_gameWorld.ApplyUpgradeOption(event.option);
+				if (!_gameWorld.HasPendingUpgrade())
+					_eventManager.Emit(GameStateChange{Playing});
+			}
+			else if constexpr (std::is_same_v<T, MouseClicked>)
+			{
+
+			}
+			else if constexpr (std::is_same_v<T, PlayerDamaged>)
+			{
+				
+			}
+			else if constexpr (std::is_same_v<T, EnemyKilled>)
+			{
+				
+			}
+
+		});
+}
 
 void Game::Start()
 {
@@ -51,7 +97,7 @@ void Game::Start()
 		return;
 
 	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "LightRogue");
-	_gameState = Game::ShowingSplash;
+	_gameState = GameState::ShowingSplash;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
 	_clock.restart();
@@ -73,7 +119,7 @@ void Game::Start()
 
 bool Game::IsExiting()
 {
-	return _gameState == Game::Exiting ? true : false;
+	return _gameState == GameState::Exiting ? true : false;
 }
 
 void Game::GameLoop()
@@ -97,6 +143,8 @@ void Game::GameLoop()
 		else if (_gameWorld.HasPendingUpgrade())
 			_gameState = Upgrading;
 	}
+
+	ProcessEvents();
 
 	_mainWindow.clear();
 	if (_gameState != ShowingSplash)
@@ -132,7 +180,13 @@ void Game::UpdateWindowTitle()
 	}
 }
 
-Game::GameState Game::_gameState = Uninitialized;
+EventManager& Game::GetEventManager()
+{
+	return _eventManager;
+}
+
+GameState Game::_gameState = GameState::Uninitialized;
 sf::RenderWindow Game::_mainWindow;
-GameWorld Game::_gameWorld;
 sf::Clock Game::_clock;
+GameWorld Game::_gameWorld;
+EventManager Game::_eventManager;

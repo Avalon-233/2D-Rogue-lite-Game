@@ -5,26 +5,32 @@
 #include"GameWorld.h"
 #include"Enemy.h"
 #include"Projectile.h"
-#include"Pickup.h"
+#include"Pickup.h"+
+#include"GameEvent.h"
 
 class Game
 {
 public:
 	static void Start();
+	static EventManager& GetEventManager();
 
 private:
 	static bool IsExiting();
 	static void GameLoop();
 
-	enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exiting, GameOver, Upgrading };
+	//enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exiting, GameOver, Upgrading };
 
 	static GameState _gameState;
 	static sf::RenderWindow _mainWindow;
 	static sf::Clock _clock;
 	static GameWorld _gameWorld;
+	static EventManager _eventManager;
 
 	static void HandleEvent(const sf::Event::Closed&);
+	static void HandleEvent(const sf::Event::MouseButtonPressed& event);
 	static void HandleEvent(const sf::Event::KeyPressed& event);
 	static void HandleEvent(const sf::Event&);
+	static void ProcessEvents();
+
 	static void UpdateWindowTitle();
 };
