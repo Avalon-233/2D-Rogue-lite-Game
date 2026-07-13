@@ -29,12 +29,17 @@ public:
 
 	void DrawUI(sf::RenderWindow& renderWindow);
 	void DrawUpgradeUI(sf::RenderWindow& renderWindow);
+
 	bool IsPlayerDead()const;
 	bool IsTimeUp()const;
 	bool HasPendingUpgrade()const;
 	void ApplyUpgradeOption(int option);
 	float GetGameTime()const;
+	int GetScore()const;
+	int GetPlayerLevel()const;
+	const std::array<int, 3>& GetPlayerUpgradeOptions() const;
 	std::string GetUpgradePrompt()const;
+	UIManager& GetUIManager();
 
 private:
 	
@@ -55,6 +60,8 @@ private:
 	float _baseInterval = 2.5f;
 	float _decayRate = 0.03f;
 	float _gameTimeLimit = 360.f;
+
+	int _scoreCounter = 0;
 
 	UIManager _uiManager;
 	

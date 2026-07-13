@@ -21,6 +21,7 @@ public:
 	float GetMaxHP()const;
 	float GetDamage()const;
 	float GetExperienceValue()const;
+	int GetScoreValue()const;
 
 private:
 	Player* _target = nullptr;
@@ -29,6 +30,7 @@ private:
 	float _damage = 10.f;
 	float _speed = 60.f;
 	float _experienceValue = 5.f;
+	int _scoreValue = 1;
 
 	bool _isShooted=false;
 

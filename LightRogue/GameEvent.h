@@ -1,5 +1,5 @@
 #pragma once
-#include<queue>;
+#include<queue>
 #include<variant>
 
 enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exiting, GameOver, Upgrading };

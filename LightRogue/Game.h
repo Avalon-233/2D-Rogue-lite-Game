@@ -5,8 +5,9 @@
 #include"GameWorld.h"
 #include"Enemy.h"
 #include"Projectile.h"
-#include"Pickup.h"+
+#include"Pickup.h"
 #include"GameEvent.h"
+#include"UI.h"
 
 class Game
 {
@@ -26,7 +27,10 @@ private:
 	static GameWorld _gameWorld;
 	static EventManager _eventManager;
 
+	static void BeginPlaying();
+
 	static void HandleEvent(const sf::Event::Closed&);
+	static void HandleEvent(const sf::Event::MouseMoved& event);
 	static void HandleEvent(const sf::Event::MouseButtonPressed& event);
 	static void HandleEvent(const sf::Event::KeyPressed& event);
 	static void HandleEvent(const sf::Event&);

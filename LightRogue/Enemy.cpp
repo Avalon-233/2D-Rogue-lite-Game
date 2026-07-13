@@ -71,6 +71,10 @@ float Enemy::GetExperienceValue()const
 {
 	return _experienceValue;
 }
+int Enemy::GetScoreValue()const
+{
+	return _scoreValue;
+}
 
 bool Enemy::IsVisible()
 {

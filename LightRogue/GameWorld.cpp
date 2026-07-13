@@ -117,6 +117,7 @@ void GameWorld::CleanUp()
 		else
 		{
 			Game::GetEventManager().Emit(EnemyKilled{});
+			_scoreCounter += (*itEnemy)->GetScoreValue();
 			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue());
 			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
 			Add(std::move(pickup));
@@ -205,7 +206,7 @@ void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
 
 void GameWorld::DrawUpgradeUI(sf::RenderWindow& renderWindow)
 {
-	_uiManager.DrawUpgradeChoices(renderWindow, _player.get());
+	//_uiManager.DrawUpgradeChoices(renderWindow, _player.get());
 }
 
 bool GameWorld::IsPlayerDead()const
@@ -234,6 +235,22 @@ float GameWorld::GetGameTime()const
 	return _gameTime;
 }
 
+int GameWorld::GetScore()const
+{
+	return _scoreCounter;
+}
+
+int GameWorld::GetPlayerLevel()const
+{
+	return _player->GetLevel();
+}
+
+const std::array<int, 3>& GameWorld::GetPlayerUpgradeOptions() const
+{
+	static const std::array<int, 3> fallback = { 1, 2, 3 };
+	return _player ? _player->GetCurrentUpgradeOptions() : fallback;
+}
+
 std::string GameWorld::GetUpgradePrompt()const
 {
 	if (!_player)
@@ -259,4 +276,9 @@ std::string GameWorld::GetUpgradePrompt()const
 	return "1: " + std::string(getName(options[0])) +
 		"  2: " + std::string(getName(options[1])) +
 		"  3: " + std::string(getName(options[2]));
+}
+
+UIManager& GameWorld::GetUIManager()
+{
+	return _uiManager;
 }

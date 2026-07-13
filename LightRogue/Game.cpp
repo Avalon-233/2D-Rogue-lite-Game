@@ -7,10 +7,29 @@ void Game::HandleEvent(const sf::Event::Closed&)
 	_eventManager.Emit(GameStateChange{ Exiting });
 }
 
+void Game::HandleEvent(const sf::Event::MouseMoved& event)
+{
+	_gameWorld.GetUIManager().UpdateOverlayHover(_mainWindow, event.position);
+}
+
 void Game::HandleEvent(const sf::Event::MouseButtonPressed& event)
 {
-	if(event.button==sf::Mouse::Button::Left)
-	    _eventManager.Emit(MouseClicked{event.position.x,event.position.y,_gameState});
+	int action = _gameWorld.GetUIManager().HitTestOverlay(_mainWindow, event.position);
+
+	switch (_gameState)
+	{
+	case ShowingSplash:
+		if (action == 1) BeginPlaying();
+		break;
+	case Paused:
+		if (action == 1) _eventManager.Emit(GameStateChange{ Playing });
+		if (action == 2) _eventManager.Emit(GameStateChange{ Exiting });
+		break;
+	case Upgrading:
+		if (action >= 1 && action <= 3)
+			_eventManager.Emit(UpgradeSelected{ action });
+		break;
+	}
 }
 
 void Game::HandleEvent(const sf::Event::KeyPressed& event)
@@ -31,8 +50,6 @@ void Game::HandleEvent(const sf::Event::KeyPressed& event)
 	case ShowingSplash:
 		if (event.code == sf::Keyboard::Key::Escape)
 			_eventManager.Emit(GameStateChange{ Exiting });
-		else
-			_eventManager.Emit(GameStateChange{ Playing });
 		break;
 	case Upgrading:
 		if (event.code == sf::Keyboard::Key::Num1 || event.code == sf::Keyboard::Key::Numpad1)
@@ -59,11 +76,18 @@ void Game::ProcessEvents()
 			if constexpr (std::is_same_v<T, GameStateChange>)
 			{
 				_gameState = event.gameState;
+				_gameWorld.GetUIManager().ActivateOverlay(event.gameState);
+
+				if (event.gameState == Paused)
+					_gameWorld.GetUIManager().OnPauseEnter();
 			}
 			else if constexpr (std::is_same_v<T, LevelUp>)
 			{
 				if (_gameWorld.HasPendingUpgrade())
+				{
+					_gameWorld.GetUIManager().OnUpgradeEnter(_gameWorld.GetPlayerUpgradeOptions());
 					_eventManager.Emit(GameStateChange{ Upgrading });
+				}
 			}
 			else if constexpr (std::is_same_v<T, UpgradeSelected>)
 			{
@@ -96,6 +120,10 @@ void Game::Start()
 	_gameState = GameState::ShowingSplash;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
+	_gameWorld.GetUIManager().LoadOverlayResources();
+	_gameWorld.GetUIManager().OnSplashEnter();
+	_gameWorld.GetUIManager().ActivateOverlay(GameState::ShowingSplash);
+
 	_clock.restart();
 	
 	//Create a player
@@ -135,20 +163,35 @@ void Game::GameLoop()
 		_gameWorld.CleanUp();
 
 		if (_gameWorld.IsPlayerDead() || _gameWorld.IsTimeUp())
+		{
+			_gameWorld.GetUIManager().OnGameOverEnter(
+				_gameWorld.GetGameTime(),
+				_gameWorld.GetScore(),
+				_gameWorld.GetPlayerLevel());
+			_gameWorld.GetUIManager().ActivateOverlay(GameState::GameOver);
 			_gameState = GameOver;
-		else if (_gameWorld.HasPendingUpgrade())
-			_gameState = Upgrading;
+		}
 	}
 
 	ProcessEvents();
 
 	_mainWindow.clear();
-	if (_gameState != ShowingSplash)
+	if (_gameState == ShowingSplash)
+		_gameWorld.GetUIManager().DrawOverlay(_mainWindow);
+	else
+	{
 		_gameWorld.DrawAll(_mainWindow);
-	if (_gameState == Upgrading)
-		_gameWorld.DrawUpgradeUI(_mainWindow);
+		if (_gameState != Playing)
+			_gameWorld.GetUIManager().DrawOverlay(_mainWindow);
+	}
 	UpdateWindowTitle();
 	_mainWindow.display();
+}
+
+void Game::BeginPlaying()
+{
+	_gameState = Playing;
+	_clock.restart();
 }
 
 void Game::UpdateWindowTitle()

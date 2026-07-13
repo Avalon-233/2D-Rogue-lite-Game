@@ -3,6 +3,340 @@
 #include "Player.h"
 #include "Enemy.h"
 
+void UIManager::ActivateOverlay(GameState state)
+{
+    switch (state)
+    {
+    case ShowingSplash: _activeOverlay = &_splashUI; break;
+    case Paused:        _activeOverlay = &_pauseUI;  break;
+    case Upgrading:     _activeOverlay = &_upgradeUI; break;
+    case GameOver:      _activeOverlay = &_gameOverUI; break;
+    default:            _activeOverlay = nullptr;     break;
+    }
+}
+
+void UIManager::UpdateOverlayHover(const sf::RenderWindow& window,sf::Vector2i position)
+{
+    if (_activeOverlay)
+        _activeOverlay->UpdateHover(window, position);
+}
+
+int UIManager::HitTestOverlay(const sf::RenderWindow& window,sf::Vector2i position) const
+{
+    return _activeOverlay ? _activeOverlay->HitTest(window, position) : 0;
+}
+
+void UIManager::DrawOverlay(sf::RenderWindow& window)
+{
+    if (_activeOverlay)
+        _activeOverlay->Draw(window);
+}
+
+void UIManager::LoadOverlayResources()
+{
+    _splashUI.LoadResources();
+    _pauseUI.LoadResources();
+    _upgradeUI.LoadResources();
+    _gameOverUI.LoadResources();
+}
+
+void UIManager::OnSplashEnter()
+{
+    _splashUI.OnEnter();
+}
+
+void UIManager::OnPauseEnter()
+{
+    _pauseUI.OnEnter();
+}
+
+void UIManager::OnUpgradeEnter(const std::array<int, 3>& options)
+{
+    _upgradeUI.OnEnter(options);
+}
+
+void UIManager::OnGameOverEnter(float time, int score, int level)
+{
+    _gameOverUI.OnEnter(time, score, level);
+}
+void SplashOverlayUI::LoadResources()
+{
+    _backgroundReady =
+        _backgroundTexture.loadFromFile("resource/SplashScreen.png") ||
+        _backgroundTexture.loadFromFile("../resource/SplashScreen.png") ||
+        _backgroundTexture.loadFromFile("../../resource/SplashScreen.png");
+
+    if (_backgroundReady)
+        _backgroundTexture.setSmooth(true);
+
+    _fontReady = OverlayUI::LoadFont(_font);
+}
+
+void SplashOverlayUI::OnEnter()
+{
+    _animationClock.restart();
+    _buttonHovered = false;
+}
+
+void SplashOverlayUI::UpdateHover(const sf::RenderWindow& window, sf::Vector2i position)
+{
+    _buttonHovered = (HitTest(window, position) == 1);
+}
+
+int SplashOverlayUI::HitTest(const sf::RenderWindow& window, sf::Vector2i position) const
+{
+    const sf::Vector2f mousePoint(
+        static_cast<float>(position.x),
+        static_cast<float>(position.y)
+    );
+    return GetStartButtonBounds(window).contains(mousePoint) ? 1 : 0;
+}
+
+void SplashOverlayUI::Draw(sf::RenderWindow& window)
+{
+    const sf::Vector2f windowSize(window.getSize());
+    const sf::Vector2f center(windowSize.x / 2.f, windowSize.y / 2.f);
+
+    if (_backgroundReady)
+    {
+        sf::Sprite background(_backgroundTexture);
+        const sf::Vector2u textureSize = _backgroundTexture.getSize();
+        const float scale = std::max(
+            windowSize.x / static_cast<float>(textureSize.x),
+            windowSize.y / static_cast<float>(textureSize.y)
+        );
+        background.setScale({ scale, scale });
+        background.setPosition({
+            (windowSize.x - static_cast<float>(textureSize.x) * scale) / 2.f,
+            (windowSize.y - static_cast<float>(textureSize.y) * scale) / 2.f
+            });
+        window.draw(background);
+    }
+    else
+    {
+        sf::RectangleShape bg(windowSize);
+        bg.setFillColor(sf::Color(17, 19, 30));
+        window.draw(bg);
+    }
+
+    sf::RectangleShape shade(windowSize);
+    shade.setFillColor(sf::Color(0, 0, 0, 120));
+    window.draw(shade);
+
+    // 刷新悬停状态
+    _buttonHovered = (HitTest(window, sf::Mouse::getPosition(window)) == 1);
+    const float time = _animationClock.getElapsedTime().asSeconds();
+    const sf::FloatRect buttonBounds = GetStartButtonBounds(window);
+    const sf::Vector2f buttonCenter(
+        buttonBounds.position.x + buttonBounds.size.x / 2.f,
+        buttonBounds.position.y + buttonBounds.size.y / 2.f
+    );
+    const float pulse = _buttonHovered
+        ? std::sin(time * 8.f) * 4.f : std::sin(time * 2.f) * 2.f;
+    const sf::Vector2f buttonSize(
+        buttonBounds.size.x + (_buttonHovered ? 28.f : 0.f) + pulse,
+        buttonBounds.size.y + (_buttonHovered ? 12.f : 0.f) + pulse
+    );
+
+    sf::RectangleShape glow(buttonSize + sf::Vector2f(24.f, 18.f));
+    glow.setOrigin(glow.getSize() / 2.f);
+    glow.setPosition(buttonCenter);
+    glow.setFillColor(_buttonHovered
+        ? sf::Color(255, 205, 90, 70) : sf::Color(80, 140, 255, 35));
+    window.draw(glow);
+
+    sf::RectangleShape button(buttonSize);
+    button.setOrigin(buttonSize / 2.f);
+    button.setPosition(buttonCenter);
+    button.setFillColor(_buttonHovered
+        ? sf::Color(255, 205, 90, 230) : sf::Color(26, 31, 48, 230));
+    button.setOutlineThickness(3.f);
+    button.setOutlineColor(_buttonHovered
+        ? sf::Color(255, 245, 190) : sf::Color(115, 170, 255));
+    window.draw(button);
+
+    if (!_fontReady) return;
+
+    sf::Text title(_font, "LightRogue", 74);
+    title.setFillColor(sf::Color(245, 248, 255));
+    CenterText(title, { center.x, 150.f });
+    window.draw(title);
+
+    sf::Text subtitle(_font, "ESC exits. Any other key starts.", 24);
+    subtitle.setFillColor(sf::Color(200, 215, 235));
+    CenterText(subtitle, { center.x, 220.f });
+    window.draw(subtitle);
+
+    sf::Text startText(_font, sf::String(L"\u5F00\u59CB\u6E38\u620F"),
+        _buttonHovered ? 50u : 46u);
+    startText.setFillColor(_buttonHovered
+        ? sf::Color(24, 28, 42) : sf::Color(245, 248, 255));
+    CenterText(startText, buttonCenter + sf::Vector2f(0.f, _buttonHovered ? -3.f : 0.f));
+    window.draw(startText);
+
+    sf::Text hint(_font, "Move the mouse over the text, then click to start.", 20);
+    hint.setFillColor(sf::Color(185, 195, 210));
+    CenterText(hint, { center.x, buttonCenter.y + 88.f });
+    window.draw(hint);
+}
+
+sf::FloatRect SplashOverlayUI::GetStartButtonBounds(
+    const sf::RenderWindow& window) const
+{
+    const sf::Vector2u pixelSize = window.getSize();
+    const float centerX = static_cast<float>(pixelSize.x) / 2.f;
+    const float centerY = static_cast<float>(pixelSize.y) * 0.66f;
+    return sf::FloatRect({ centerX - 170.f, centerY - 44.f }, { 340.f, 88.f });
+}
+
+void PauseOverlayUI::LoadResources()
+{
+    _fontReady = OverlayUI::LoadFont(_font);
+}
+
+void PauseOverlayUI::OnEnter()
+{
+    _animationClock.restart();
+    _continueHovered = false;
+    _quitHovered = false;
+}
+
+void PauseOverlayUI::UpdateHover(const sf::RenderWindow& window,
+    sf::Vector2i position)
+{
+    const sf::Vector2f mousePoint(
+        static_cast<float>(position.x),
+        static_cast<float>(position.y)
+    );
+    _continueHovered = GetContinueButtonBounds(window).contains(mousePoint);
+    _quitHovered = GetQuitButtonBounds(window).contains(mousePoint);
+}
+
+int PauseOverlayUI::HitTest(const sf::RenderWindow& window,
+    sf::Vector2i position) const
+{
+    const sf::Vector2f mousePoint(
+        static_cast<float>(position.x),
+        static_cast<float>(position.y)
+    );
+    if (GetContinueButtonBounds(window).contains(mousePoint)) return 1;
+    if (GetQuitButtonBounds(window).contains(mousePoint))     return 2;
+    return 0;
+}
+
+void PauseOverlayUI::Draw(sf::RenderWindow& window)
+{
+    const sf::Vector2f windowSize(window.getSize());
+    const sf::Vector2f center(windowSize.x / 2.f, windowSize.y / 2.f);
+
+    // 刷新悬停
+    UpdateHover(window, sf::Mouse::getPosition(window));
+    const float time = _animationClock.getElapsedTime().asSeconds();
+
+    // 遮罩
+    sf::RectangleShape overlay(windowSize);
+    overlay.setFillColor(sf::Color(4, 7, 22, 190));
+    window.draw(overlay);
+
+    if (!_fontReady) return;
+
+    sf::Text title(_font, "PAUSED", 64);
+    title.setFillColor(sf::Color(238, 212, 132));
+    CenterText(title, { center.x, center.y - 160.f });
+    window.draw(title);
+
+    sf::Text subtitle(_font, "Press ESC or click a button", 22);
+    subtitle.setFillColor(sf::Color(151, 169, 188));
+    CenterText(subtitle, { center.x, center.y - 100.f });
+    window.draw(subtitle);
+
+    // Continue 按钮
+    DrawAnimatedButton(window, GetContinueButtonBounds(window),
+        _continueHovered, "CONTINUE",
+        sf::Color(255, 205, 90), sf::Color(255, 220, 120), 0.f, _font);
+
+    // Quit 按钮
+    DrawAnimatedButton(window, GetQuitButtonBounds(window),
+        _quitHovered, "QUIT GAME",
+        sf::Color(180, 80, 60), sf::Color(220, 100, 80), 1.f, _font);
+
+    sf::Text hint(_font, "Move the mouse over a button, then click.", 18);
+    hint.setFillColor(sf::Color(140, 150, 170));
+    CenterText(hint, { center.x, center.y + 180.f });
+    window.draw(hint);
+}
+
+sf::FloatRect PauseOverlayUI::GetContinueButtonBounds(
+    const sf::RenderWindow& window) const
+{
+    const float cx = static_cast<float>(window.getSize().x) / 2.f;
+    const float cy = static_cast<float>(window.getSize().y) * 0.48f;
+    return sf::FloatRect({ cx - 200.f, cy - 40.f }, { 400.f, 80.f });
+}
+
+sf::FloatRect PauseOverlayUI::GetQuitButtonBounds(
+    const sf::RenderWindow& window) const
+{
+    const float cx = static_cast<float>(window.getSize().x) / 2.f;
+    const float cy = static_cast<float>(window.getSize().y) * 0.48f + 110.f;
+    return sf::FloatRect({ cx - 200.f, cy - 40.f }, { 400.f, 80.f });
+}
+
+void PauseOverlayUI::DrawAnimatedButton(sf::RenderWindow& window,
+    const sf::FloatRect& bounds, bool hovered,
+    const char* labelText, sf::Color baseColor, sf::Color hoverColor,
+    float phaseOffset, const sf::Font& font) const
+{
+    const float time = _animationClock.getElapsedTime().asSeconds();
+    const sf::Vector2f btnCenter(
+        bounds.position.x + bounds.size.x / 2.f,
+        bounds.position.y + bounds.size.y / 2.f
+    );
+    const float pulse = hovered
+        ? std::sin(time * 8.f + phaseOffset) * 4.f
+        : std::sin(time * 2.f + phaseOffset) * 2.f;
+    const sf::Vector2f btnSize(
+        bounds.size.x + (hovered ? 28.f : 0.f) + pulse,
+        bounds.size.y + (hovered ? 12.f : 0.f) + pulse
+    );
+
+    sf::RectangleShape glow(btnSize + sf::Vector2f(24.f, 18.f));
+    glow.setOrigin(glow.getSize() / 2.f);
+    glow.setPosition(btnCenter);
+    glow.setFillColor(hovered
+        ? sf::Color(hoverColor.r, hoverColor.g, hoverColor.b, 70)
+        : sf::Color(baseColor.r, baseColor.g, baseColor.b, 30));
+    window.draw(glow);
+
+    sf::RectangleShape button(btnSize);
+    button.setOrigin(btnSize / 2.f);
+    button.setPosition(btnCenter);
+    button.setFillColor(hovered
+        ? sf::Color(hoverColor.r, hoverColor.g, hoverColor.b, 230)
+        : sf::Color(26, 31, 48, 230));
+    button.setOutlineThickness(3.f);
+    button.setOutlineColor(hovered
+        ? sf::Color(std::min(255, hoverColor.r + 50),
+            std::min(255, hoverColor.g + 50),
+            std::min(255, hoverColor.b + 50))
+        : sf::Color(std::min(255, baseColor.r + 30),
+            std::min(255, baseColor.g + 30),
+            std::min(255, baseColor.b + 30)));
+    window.draw(button);
+
+    sf::Text label(font, labelText, hovered ? 42u : 38u);
+    label.setFillColor(hovered
+        ? sf::Color(24, 28, 42) : sf::Color(245, 248, 255));
+    // 手动居中（不用 CenterText，因为它是 const 且需要非 const）
+    {
+        const sf::FloatRect b = label.getLocalBounds();
+        label.setOrigin({ b.position.x + b.size.x / 2.f,
+                          b.position.y + b.size.y / 2.f });
+    }
+    label.setPosition(btnCenter + sf::Vector2f(0.f, hovered ? -3.f : 0.f));
+    window.draw(label);
+}
+
 StatusBar::StatusBar()
 {
     _width = 100.f;
@@ -67,13 +401,14 @@ void StatusBar::Draw(sf::RenderWindow& window)
 
 UIManager::UIManager()
 {
+    /*
     _fontLoaded =
         _font.openFromFile("SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
         _font.openFromFile("LightRogue/SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
         _font.openFromFile("../SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
         _font.openFromFile("../../SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
         _font.openFromFile("C:/Windows/Fonts/segoeui.ttf");
-
+        */
     _playerHealthBar.SetSize(220.f, 18.f);
     _playerHealthBar.SetColors(
         sf::Color(40, 40, 40),
@@ -108,106 +443,121 @@ void UIManager::DrawPlayerHUD(sf::RenderWindow& window, const Player* player)
     _playerExperienceBar.SetValue(player->GetExperience(), player->GetExperienceNeeded());
     _playerExperienceBar.Draw(window);
 }
-/*
-void UIManager::DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy)
+
+void UpgradeOverlayUI::LoadResources()
 {
-    if (!enemy)
-    {
-        return;
-    }
+    _fontReady = OverlayUI::LoadFont(_font);
+}
 
-    if (!enemy->IsExisting())
-    {
-        return;
-    }
+void UpgradeOverlayUI::OnEnter() {}
 
-    sf::Vector2f enemyPosition = enemy->GetPosition();
-
-    const float barWidth = 42.f;
-    const float barHeight = 6.f;
-    const float x = enemyPosition.x - barWidth / 2.f;
-    const float y = enemyPosition.y - 30.f;
-
-    _enemyHealthBar.SetSize(barWidth, barHeight);
-    _enemyHealthBar.SetPosition(x, y);
-    _enemyHealthBar.SetValue(enemy->GetHP(), enemy->GetMaxHP());
-    _enemyHealthBar.Draw(window);
-}*/
-
-void UIManager::DrawUpgradeChoices(sf::RenderWindow& window, const Player* player)
+void UpgradeOverlayUI::OnEnter(const std::array<int, 3>& options)
 {
-    if (!player)
-    {
-        return;
-    }
+    _cachedOptions = options;
+}
 
-    const auto& options = player->GetCurrentUpgradeOptions();
+int UpgradeOverlayUI::HitTest(const sf::RenderWindow& window,
+    sf::Vector2i position) const
+{
+    const float windowWidth = static_cast<float>(window.getSize().x);
+    for (int i = 0; i < 3; ++i)
+    {
+        if (GetCardBounds(i, windowWidth).contains(
+            { static_cast<float>(position.x),
+              static_cast<float>(position.y) }))
+            return i + 1;
+    }
+    return 0;
+}
+
+void UpgradeOverlayUI::Draw(sf::RenderWindow& window)
+{
+    if (!_fontReady) return;
+
     const sf::Vector2f windowSize(window.getSize());
+    const float startX = windowSize.x / 2.f
+        - (CardSize.x * 3.f + CardGap * 2.f) / 2.f;
 
+    // 遮罩
     sf::RectangleShape overlay(windowSize);
     overlay.setFillColor(sf::Color(4, 7, 18, 218));
     window.draw(overlay);
 
+    // 顶部装饰线
     sf::RectangleShape topRule({ 660.f, 2.f });
     topRule.setPosition({ windowSize.x / 2.f - 330.f, 104.f });
     topRule.setFillColor(sf::Color(68, 214, 221, 150));
     window.draw(topRule);
 
-    DrawText(window, "CHOOSE YOUR LIGHT CODE", 34u, { windowSize.x / 2.f, 58.f }, sf::Color(238, 212, 132), true);
-    DrawText(window, "Press 1 / 2 / 3 to install one upgrade", 18u, { windowSize.x / 2.f, 112.f }, sf::Color(178, 226, 229), true);
+    // 标题
+    sf::Text title(_font, "CHOOSE YOUR LIGHT CODE", 34);
+    title.setFillColor(sf::Color(238, 212, 132));
+    CenterText(title, { windowSize.x / 2.f, 58.f });
+    window.draw(title);
 
-    const sf::Vector2f cardSize(250.f, 365.f);
-    const float gap = 38.f;
-    const float totalWidth = cardSize.x * 3.f + gap * 2.f;
-    const float startX = windowSize.x / 2.f - totalWidth / 2.f;
-    const float cardY = 184.f;
+    sf::Text subtitle(_font, "Press 1/2/3 or click a card", 18);
+    subtitle.setFillColor(sf::Color(178, 226, 229));
+    CenterText(subtitle, { windowSize.x / 2.f, 112.f });
+    window.draw(subtitle);
 
+    // 三张卡片
     for (int i = 0; i < 3; ++i)
     {
-        DrawUpgradeCard(
-            window,
-            { startX + static_cast<float>(i) * (cardSize.x + gap), cardY },
-            cardSize,
-            i + 1,
-            options[i]
-        );
+        DrawOneCard(window,
+            { startX + i * (CardSize.x + CardGap), CardY },
+            i + 1, _cachedOptions[i], _font);
     }
 
+    // 底部线
     sf::RectangleShape bottomRule({ 520.f, 2.f });
     bottomRule.setPosition({ windowSize.x / 2.f - 260.f, 604.f });
     bottomRule.setFillColor(sf::Color(198, 164, 72, 135));
     window.draw(bottomRule);
 
-    DrawText(window, "The battle is paused while this panel is open", 16u, { windowSize.x / 2.f, 632.f }, sf::Color(151, 169, 188), true);
+    sf::Text hint(_font, "The battle is paused while this panel is open", 16);
+    hint.setFillColor(sf::Color(151, 169, 188));
+    CenterText(hint, { windowSize.x / 2.f, 632.f });
+    window.draw(hint);
 }
 
-void UIManager::DrawUpgradeCard(sf::RenderWindow& window, sf::Vector2f position, sf::Vector2f size, int shortcut, int upgradeType)
+sf::FloatRect UpgradeOverlayUI::GetCardBounds(int cardIndex,
+    float windowWidth) const
+{
+    const float totalWidth = CardSize.x * 3.f + CardGap * 2.f;
+    const float startX = windowWidth / 2.f - totalWidth / 2.f;
+    const float left = startX + cardIndex * (CardSize.x + CardGap);
+    return sf::FloatRect({ left, CardY }, { CardSize.x, CardSize.y });
+}
+
+void UpgradeOverlayUI::DrawOneCard(sf::RenderWindow& window,
+    sf::Vector2f position, int shortcut, int upgradeType,
+    const sf::Font& font) const
 {
     const sf::Color cardFill(10, 17, 34, 238);
     const sf::Color cyan(74, 218, 226);
     const sf::Color gold(218, 178, 79);
     const sf::Color muted(142, 161, 184);
 
-    sf::RectangleShape shadow(size);
+    sf::RectangleShape shadow(CardSize);
     shadow.setPosition(position + sf::Vector2f(8.f, 10.f));
     shadow.setFillColor(sf::Color(0, 0, 0, 120));
     window.draw(shadow);
 
-    sf::RectangleShape outer(size);
+    sf::RectangleShape outer(CardSize);
     outer.setPosition(position);
     outer.setFillColor(cardFill);
     outer.setOutlineThickness(3.f);
     outer.setOutlineColor(gold);
     window.draw(outer);
 
-    sf::RectangleShape inner(size - sf::Vector2f(22.f, 22.f));
+    sf::RectangleShape inner(CardSize - sf::Vector2f(22.f, 22.f));
     inner.setPosition(position + sf::Vector2f(11.f, 11.f));
     inner.setFillColor(sf::Color::Transparent);
     inner.setOutlineThickness(1.f);
     inner.setOutlineColor(sf::Color(74, 218, 226, 160));
     window.draw(inner);
 
-    sf::RectangleShape topGlow({ size.x - 36.f, 4.f });
+    sf::RectangleShape topGlow({ CardSize.x - 36.f, 4.f });
     topGlow.setPosition(position + sf::Vector2f(18.f, 22.f));
     topGlow.setFillColor(sf::Color(74, 218, 226, 180));
     window.draw(topGlow);
@@ -220,48 +570,82 @@ void UIManager::DrawUpgradeCard(sf::RenderWindow& window, sf::Vector2f position,
     window.draw(leftCorner);
 
     sf::ConvexShape rightCorner(3);
-    rightCorner.setPoint(0, position + sf::Vector2f(size.x, size.y));
-    rightCorner.setPoint(1, position + sf::Vector2f(size.x - 38.f, size.y));
-    rightCorner.setPoint(2, position + sf::Vector2f(size.x, size.y - 38.f));
+    rightCorner.setPoint(0, position + sf::Vector2f(CardSize.x, CardSize.y));
+    rightCorner.setPoint(1, position + sf::Vector2f(CardSize.x - 38.f, CardSize.y));
+    rightCorner.setPoint(2, position + sf::Vector2f(CardSize.x, CardSize.y - 38.f));
     rightCorner.setFillColor(sf::Color(218, 178, 79, 150));
     window.draw(rightCorner);
 
     sf::CircleShape badge(36.f, 6);
     badge.setOrigin({ 36.f, 36.f });
-    badge.setPosition(position + sf::Vector2f(size.x / 2.f, 0.f));
+    badge.setPosition(position + sf::Vector2f(CardSize.x / 2.f, 0.f));
     badge.setRotation(sf::degrees(30.f));
     badge.setFillColor(sf::Color(13, 29, 49));
     badge.setOutlineThickness(3.f);
     badge.setOutlineColor(gold);
     window.draw(badge);
 
-    DrawText(window, std::to_string(shortcut), 30u, position + sf::Vector2f(size.x / 2.f, -19.f), sf::Color(244, 232, 174), true);
+    // 快捷键数字
+    sf::Text numText(font, std::to_string(shortcut), 30);
+    numText.setFillColor(sf::Color(244, 232, 174));
+    {
+        const sf::FloatRect b = numText.getLocalBounds();
+        numText.setOrigin({ b.position.x + b.size.x / 2.f, b.position.y });
+    }
+    numText.setPosition(position + sf::Vector2f(CardSize.x / 2.f, -19.f));
+    window.draw(numText);
 
     sf::CircleShape iconPlate(68.f, 6);
     iconPlate.setOrigin({ 68.f, 68.f });
-    iconPlate.setPosition(position + sf::Vector2f(size.x / 2.f, 126.f));
+    iconPlate.setPosition(position + sf::Vector2f(CardSize.x / 2.f, 126.f));
     iconPlate.setRotation(sf::degrees(30.f));
     iconPlate.setFillColor(sf::Color(7, 35, 52));
     iconPlate.setOutlineThickness(2.f);
     iconPlate.setOutlineColor(sf::Color(74, 218, 226, 190));
     window.draw(iconPlate);
 
-    DrawUpgradeIcon(window, position + sf::Vector2f(size.x / 2.f, 126.f), upgradeType);
+    DrawUpgradeIcon(window, position + sf::Vector2f(CardSize.x / 2.f, 126.f),
+        upgradeType);
 
-    DrawText(window, GetUpgradeName(upgradeType), 23u, position + sf::Vector2f(size.x / 2.f, 218.f), sf::Color(241, 225, 164), true);
-    DrawText(window, GetUpgradeDescription(upgradeType), 16u, position + sf::Vector2f(size.x / 2.f, 262.f), sf::Color(190, 215, 220), true);
+    // 升级名称
+    {
+        sf::Text nameText(font, GetUpgradeName(upgradeType), 23);
+        nameText.setFillColor(sf::Color(241, 225, 164));
+        const sf::FloatRect b = nameText.getLocalBounds();
+        nameText.setOrigin({ b.position.x + b.size.x / 2.f, b.position.y });
+        nameText.setPosition(position + sf::Vector2f(CardSize.x / 2.f, 218.f));
+        window.draw(nameText);
+    }
 
-    sf::RectangleShape chooseBar({ size.x - 68.f, 32.f });
-    chooseBar.setPosition(position + sf::Vector2f(34.f, size.y - 62.f));
+    // 升级描述
+    {
+        sf::Text descText(font, GetUpgradeDescription(upgradeType), 16);
+        descText.setFillColor(sf::Color(190, 215, 220));
+        const sf::FloatRect b = descText.getLocalBounds();
+        descText.setOrigin({ b.position.x + b.size.x / 2.f, b.position.y });
+        descText.setPosition(position + sf::Vector2f(CardSize.x / 2.f, 262.f));
+        window.draw(descText);
+    }
+
+    sf::RectangleShape chooseBar({ CardSize.x - 68.f, 32.f });
+    chooseBar.setPosition(position + sf::Vector2f(34.f, CardSize.y - 62.f));
     chooseBar.setFillColor(sf::Color(21, 43, 62, 230));
     chooseBar.setOutlineThickness(1.f);
     chooseBar.setOutlineColor(sf::Color(218, 178, 79, 170));
     window.draw(chooseBar);
 
-    DrawText(window, "Press " + std::to_string(shortcut), 16u, position + sf::Vector2f(size.x / 2.f, size.y - 55.f), muted, true);
+    sf::Text pressText(font, "Press " + std::to_string(shortcut), 16);
+    pressText.setFillColor(muted);
+    {
+        const sf::FloatRect b = pressText.getLocalBounds();
+        pressText.setOrigin({ b.position.x + b.size.x / 2.f, b.position.y });
+    }
+    pressText.setPosition(position + sf::Vector2f(CardSize.x / 2.f, CardSize.y - 55.f));
+    window.draw(pressText);
 }
 
-void UIManager::DrawUpgradeIcon(sf::RenderWindow& window, sf::Vector2f center, int upgradeType)
+void UpgradeOverlayUI::DrawUpgradeIcon(sf::RenderWindow& window,
+    sf::Vector2f center, int upgradeType) const
 {
     const sf::Color cyan(80, 225, 232);
     const sf::Color gold(230, 181, 74);
@@ -399,27 +783,27 @@ void UIManager::DrawUpgradeIcon(sf::RenderWindow& window, sf::Vector2f center, i
     window.draw(cut);
 }
 
-void UIManager::DrawText(sf::RenderWindow& window, const std::string& text, unsigned int size, sf::Vector2f position, sf::Color color, bool centered)
+void UIManager::DrawText(sf::RenderWindow& window,
+    const std::string& text, unsigned int size,
+    sf::Vector2f position, sf::Color color,
+    bool centered, const sf::Font& font)
 {
-    if (!_fontLoaded)
-    {
-        return;
-    }
-
-    sf::Text drawableText(_font, text, size);
+    sf::Text drawableText(font, text, size);
     drawableText.setFillColor(color);
 
     if (centered)
     {
         const auto bounds = drawableText.getLocalBounds();
-        drawableText.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y });
+        drawableText.setOrigin({
+            bounds.position.x + bounds.size.x / 2.f,
+            bounds.position.y });
     }
 
     drawableText.setPosition(position);
     window.draw(drawableText);
 }
 
-const char* UIManager::GetUpgradeName(int upgradeType)const
+const char* UpgradeOverlayUI::GetUpgradeName(int upgradeType)
 {
     switch (upgradeType)
     {
@@ -435,7 +819,7 @@ const char* UIManager::GetUpgradeName(int upgradeType)const
     }
 }
 
-const char* UIManager::GetUpgradeDescription(int upgradeType)const
+const char* UpgradeOverlayUI::GetUpgradeDescription(int upgradeType)
 {
     switch (upgradeType)
     {
@@ -449,4 +833,53 @@ const char* UIManager::GetUpgradeDescription(int upgradeType)const
     case 8: return "Need less XP to level";
     default: return "No effect";
     }
+}
+
+void GameOverOverlayUI::LoadResources()
+{
+    _fontReady = OverlayUI::LoadFont(_font);
+}
+
+void GameOverOverlayUI::OnEnter() {}
+
+void GameOverOverlayUI::OnEnter(float gameTime, int score, int level)
+{
+    _gameTime = gameTime;
+    _score = score;
+    _level = level;
+}
+
+void GameOverOverlayUI::Draw(sf::RenderWindow& window)
+{
+    if (!_fontReady) return;
+
+    const sf::Vector2f windowSize(window.getSize());
+
+    sf::RectangleShape overlay(windowSize);
+    overlay.setFillColor(sf::Color(20, 4, 4, 220));
+    window.draw(overlay);
+
+    sf::Text title(_font, "GAME OVER", 80);
+    title.setFillColor(sf::Color(236, 89, 92));
+    CenterText(title, { windowSize.x / 2.f, windowSize.y / 2.f - 140.f });
+    window.draw(title);
+
+    sf::RectangleShape divider({ 400.f, 2.f });
+    divider.setPosition({ windowSize.x / 2.f - 200.f, windowSize.y / 2.f - 70.f });
+    divider.setFillColor(sf::Color(236, 89, 92, 120));
+    window.draw(divider);
+
+    char buf[256];
+    snprintf(buf, sizeof(buf),
+        "Level %d  |  Survived %.0f seconds  |  %d Total Score",
+        _level, _gameTime, _score);
+    sf::Text stats(_font, buf, 28);
+    stats.setFillColor(sf::Color(178, 226, 229));
+    CenterText(stats, { windowSize.x / 2.f, windowSize.y / 2.f - 40.f });
+    window.draw(stats);
+
+    sf::Text hint(_font, "( Press any key to quit )", 20);
+    hint.setFillColor(sf::Color(151, 169, 188));
+    CenterText(hint, { windowSize.x / 2.f, windowSize.y / 2.f + 80.f });
+    window.draw(hint);
 }
