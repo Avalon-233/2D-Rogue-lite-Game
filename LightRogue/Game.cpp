@@ -15,41 +15,37 @@ void Game::HandleEvent(const sf::Event::MouseButtonPressed& event)
 
 void Game::HandleEvent(const sf::Event::KeyPressed& event)
 {
-	if (_gameState == Playing)
+	switch (_gameState)
 	{
-		if(event.code==sf::Keyboard::Key::Escape)
-			_eventManager.Emit(GameStateChange{ Paused });
-	}
-
-	else if (_gameState == Paused)
-	{
+	case Playing:
 		if (event.code == sf::Keyboard::Key::Escape)
-			_eventManager.Emit(GameStateChange{Playing});
-	}
-
-	else if (_gameState == GameOver)
-	{
-		_eventManager.Emit(GameStateChange{ Exiting });
-	}
-
-	else if (_gameState == ShowingSplash)
-	{
-		if(event.code == sf::Keyboard::Key::Escape)
-			_eventManager.Emit(GameStateChange{ Exiting });
-		else 
+			_eventManager.Emit(GameStateChange{ Paused });
+		break;
+	case Paused:
+		if (event.code == sf::Keyboard::Key::Escape)
 			_eventManager.Emit(GameStateChange{ Playing });
-	}
-
-	else if (_gameState == Upgrading)
-	{
+		break;
+	case GameOver:
+		_eventManager.Emit(GameStateChange{ Exiting });
+		break;
+	case ShowingSplash:
+		if (event.code == sf::Keyboard::Key::Escape)
+			_eventManager.Emit(GameStateChange{ Exiting });
+		else
+			_eventManager.Emit(GameStateChange{ Playing });
+		break;
+	case Upgrading:
 		if (event.code == sf::Keyboard::Key::Num1 || event.code == sf::Keyboard::Key::Numpad1)
 			_eventManager.Emit(UpgradeSelected{ 1 });
 		else if (event.code == sf::Keyboard::Key::Num2 || event.code == sf::Keyboard::Key::Numpad2)
 			_eventManager.Emit(UpgradeSelected{ 2 });
 		else if (event.code == sf::Keyboard::Key::Num3 || event.code == sf::Keyboard::Key::Numpad3)
 			_eventManager.Emit(UpgradeSelected{ 3 });
-
+		break;
+	default:
+		break;
 	}
+
 }
 
 void Game::HandleEvent(const sf::Event&) {}//other events

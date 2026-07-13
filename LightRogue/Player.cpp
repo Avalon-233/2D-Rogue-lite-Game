@@ -79,7 +79,8 @@ void Player::Shoot(sf::Vector2i position)
 	sf::Vector2f direction = distance.normalized();
 	if (_projectileCount <= 1)
 	{
-		FireProjectile(direction);
+		auto projectile = std::make_unique<Projectile>(_projectileTexture, GetPosition(), direction * _shootSpeed, _shootDamage, true);
+		_gameWorld->Add(std::move(projectile));
 		return;
 	}
 
@@ -92,7 +93,8 @@ void Player::Shoot(sf::Vector2i position)
 			direction.x * std::cos(angle) - direction.y * std::sin(angle),
 			direction.x * std::sin(angle) + direction.y * std::cos(angle)
 		);
-		FireProjectile(spreadDirection);
+		auto projectile = std::make_unique<Projectile>(_projectileTexture, GetPosition(), spreadDirection * _shootSpeed, _shootDamage, true);
+		_gameWorld->Add(std::move(projectile));
 	}
 }
 
@@ -174,12 +176,6 @@ void Player::CheckLevelUp()
 		experienceNeeded = GetExperienceNeeded();
 		Game::GetEventManager().Emit(LevelUp{ _level});
 	}
-}
-
-void Player::FireProjectile(sf::Vector2f direction)
-{
-	auto projectile = std::make_unique<Projectile>(_projectileTexture, GetPosition(), direction * _shootSpeed, _shootDamage, true);
-	_gameWorld->Add(std::move(projectile));
 }
 
 void Player::RollUpgradeOptions()

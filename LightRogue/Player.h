@@ -68,7 +68,6 @@ private:
 	std::array<int, 3> _currentUpgradeOptions{ ExtraProjectile, DamageUp, FireRateUp };
 	
 	void CheckLevelUp();
-	void FireProjectile(sf::Vector2f direction);
 	void RollUpgradeOptions();
 	void ApplyUpgradeType(UpgradeType upgradeType);
 
