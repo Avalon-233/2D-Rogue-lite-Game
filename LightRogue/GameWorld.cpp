@@ -13,6 +13,8 @@ GameWorld::GameWorld()
 	assert(_pickupTexture.loadFromImage(pickupImage));
 	sf::Image enemyImage({ 32,32 }, sf::Color::Red);
 	assert(_enemyTexture.loadFromImage(enemyImage));
+	sf::Image projImage({ 8,8 }, sf::Color(200, 100, 100));
+	assert(_enemyProjectileTexture.loadFromImage(projImage));
 }
 
 GameWorld::~GameWorld()
@@ -163,12 +165,91 @@ void GameWorld::UpdateSpawning(float deltaTime)
 {
 	_gameTime += deltaTime;
 	_spawnTimer += deltaTime;
+	//120s Giant begin to approach
+	if (_gameTime >= 120.f && _gameTime - deltaTime < 120.f)
+	{
+		auto giant = std::make_unique<Enemy>(_enemyTexture, this, EnemyType::Giant);
+		auto pos = GetRandomSpawnPosition();
+		giant->SetPosition(pos.x, pos.y);
+		giant->SetTarget(_player.get());
+		Add(std::move(giant));
+	}
+
 	float interval = std::max(_minInterval, _baseInterval - _gameTime * _decayRate);
 	if (_spawnTimer < interval)
 		return;
 	if (_enemies.size() < MAX_ENEMIES_COUNT)
 	{
-		auto enemy = std::make_unique<Enemy>(_enemyTexture);
+		EnemyType type = EnemyType::Basic;
+		if (_gameTime < 30.f)
+		{
+			type = EnemyType::Basic;
+		}
+		else if (_gameTime < 60.f)
+		{
+			float roll = static_cast<float>(rand()) / RAND_MAX;
+			if (roll < 0.75f) 
+				type = EnemyType::Basic;
+			else
+				type = EnemyType::Ranged;
+		}
+		else if(_gameTime<90.f)
+		{
+			float roll = static_cast<float>(rand()) / RAND_MAX;
+			if (roll < 0.60f) 
+				type = EnemyType::Basic;
+			else if (roll < 0.85f) 
+				type = EnemyType::Ranged;
+			else
+				type = EnemyType::Bomber;
+		}
+		else if (_gameTime < 150.f)
+		{
+			float roll = static_cast<float>(rand()) / RAND_MAX;
+			if (roll < 0.50f)
+				type = EnemyType::Basic;
+			else if (roll < 0.80f)
+				type = EnemyType::Ranged;
+			else
+				type = EnemyType::Bomber;
+		}
+		else if (_gameTime < 210.f)
+		{
+			float roll = static_cast<float>(rand()) / RAND_MAX;
+			if (roll < 0.45f)
+				type = EnemyType::Basic;
+			else if (roll < 0.75f)
+				type = EnemyType::Ranged;
+			else if (roll < 0.985f)
+				type = EnemyType::Bomber;
+			else 
+				type = EnemyType::Giant;
+		}
+		else if (_gameTime < 270.f)
+		{
+			float roll = static_cast<float>(rand()) / RAND_MAX;
+			if (roll < 0.40f)
+				type = EnemyType::Basic;
+			else if (roll < 0.70f)
+				type = EnemyType::Ranged;
+			else if (roll < 0.97f)
+				type = EnemyType::Bomber;
+			else
+				type = EnemyType::Giant;
+		}
+		else //enemy has been enhanced
+		{
+			float roll = static_cast<float>(rand()) / RAND_MAX;
+			if (roll < 0.35f)
+				type = EnemyType::Basic;
+			else if (roll < 0.70f)
+				type = EnemyType::Ranged;
+			else if (roll < 0.95f)
+				type = EnemyType::Bomber;
+			else
+				type = EnemyType::Giant;
+		}
+		auto enemy = std::make_unique<Enemy>(_enemyTexture,this,type);
 		auto position = GetRandomSpawnPosition();
 		enemy->SetPosition(position.x,position.y);
 		enemy->SetTarget(_player.get());
@@ -249,6 +330,11 @@ const std::array<int, 3>& GameWorld::GetPlayerUpgradeOptions() const
 {
 	static const std::array<int, 3> fallback = { 1, 2, 3 };
 	return _player ? _player->GetCurrentUpgradeOptions() : fallback;
+}
+
+const sf::Texture& GameWorld::GetEnemyProjectileTexture() const
+{
+	return _enemyProjectileTexture;
 }
 
 std::string GameWorld::GetUpgradePrompt()const

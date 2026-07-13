@@ -38,6 +38,7 @@ public:
 	int GetScore()const;
 	int GetPlayerLevel()const;
 	const std::array<int, 3>& GetPlayerUpgradeOptions() const;
+	const sf::Texture& GetEnemyProjectileTexture() const;
 	std::string GetUpgradePrompt()const;
 	UIManager& GetUIManager();
 
@@ -52,6 +53,7 @@ private:
 	std::vector<std::unique_ptr<Pickup>> _pickups;
 	sf::Texture _pickupTexture;
 	sf::Texture _enemyTexture;
+	sf::Texture _enemyProjectileTexture;
 
 	float _gameTime = 0.f;
 	float _spawnTimer = 0.f;
