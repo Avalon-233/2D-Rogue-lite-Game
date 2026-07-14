@@ -89,6 +89,8 @@ void Player::HandleCollision(Projectile* projectile)
 void Player::HandleCollision(Pickup* pickup)
 {
 	AddExperience(pickup->GetExperienceValue());
+	_HP += pickup->GetHealValue();
+	if(_HP > _maxHP)_HP = _maxHP;
 }
 
 void Player::Shoot(sf::Vector2i position)
@@ -190,6 +192,7 @@ void Player::CheckLevelUp()
 	{
 		_experience -= experienceNeeded;
 		_level++;
+		_visionRadius += 10.f;
 		if (_pendingUpgradeCount == 0)
 			RollUpgradeOptions();
 		_pendingUpgradeCount++;

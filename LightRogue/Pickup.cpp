@@ -3,8 +3,8 @@
 #include"Game.h"
 #include"Player.h"
 
-Pickup::Pickup(const sf::Texture& texture, float experienceValue)
-	: GameObject(texture), _experienceValue(experienceValue)
+Pickup::Pickup(const sf::Texture& texture, float experienceValue, float healValue)
+	: GameObject(texture), _experienceValue(experienceValue),_healValue(healValue)
 {
 	_sprite.setOrigin(_sprite.getGlobalBounds().size / 2.f);
 }
@@ -21,4 +21,9 @@ void Pickup::HandleCollision(Player* player)
 float Pickup::GetExperienceValue()const
 {
 	return _experienceValue;
+}
+
+float Pickup::GetHealValue()const
+{
+	return _healValue;
 }

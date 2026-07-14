@@ -120,7 +120,7 @@ void GameWorld::CleanUp()
 		{
 			Game::GetEventManager().Emit(EnemyKilled{});
 			_scoreCounter += (*itEnemy)->GetScoreValue();
-			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue());
+			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue(), (*itEnemy)->GetHealValue());
 			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
 			Add(std::move(pickup));
 			itEnemy = _enemies.erase(itEnemy);

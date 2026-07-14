@@ -24,6 +24,7 @@ public:
 	float GetDamage()const;
 	float GetExperienceValue()const;
 	int GetScoreValue()const;
+	float GetHealValue()const;
 	bool IsVisible()override;
 
 private:
@@ -31,22 +32,23 @@ private:
 	//basic properties
 	Player* _target = nullptr;
 	GameWorld* _gameWorld;
-	float _maxHP = 30.f;
-	float _HP = 30.f;
-	float _damage = 10.f;
-	float _speed = 60.f;
-	float _experienceValue = 5.f;
-	int _scoreValue = 1;
+	float _maxHP = 0.f;
+	float _HP = 0.f;
+	float _damage = 0.f;
+	float _speed = 0.f;
+	float _experienceValue = 0.f;
+	int _scoreValue = 0;
+	float _healValue = 0.f;
 	//ranged-specific
-	float _shootRange = 250.f;
-	float _escapeDistance = 180.f;
-	float _shootCooldown = 0.5f;
+	float _shootRange = 0.f;
+	float _escapeDistance = 0.f;
+	float _shootCooldown = 0.f;
 	float _shootTimer = 0.f;
-	float _shootDamage = 10.f;
-	float _shootSpeed = 500.f;
+	float _shootDamage = 0.f;
+	float _shootSpeed = 0.f;
 	void Shoot();
 	//bomber-specific
-	float _bombRadius = 30.f;
+	float _bombRadius = 0.f;
 	void Bomb();
 
 	bool _isShooted=false;

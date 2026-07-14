@@ -36,7 +36,7 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_maxHP = 15.f;
 		_HP = 15.f;
 		_damage = 30.f;
-		_speed = 100.f;
+		_speed = 150.f;
 		_experienceValue = 10.f;
 		_scoreValue = 3;
 		_bombRadius = 30.f;
@@ -47,10 +47,12 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_HP = 750.f;
 		_damage = 45.f;
 		_speed = 25.f;
-		_experienceValue = 30.f;
+		_experienceValue = 50.f;
 		_scoreValue = 10;
+		_healValue = 30.f;
 		_sprite.setScale({ 3.f, 3.f });
 		_sprite.setColor(sf::Color(200, 80, 200));
+		break;
 	case EnemyType::Elite:
 		_maxHP = 80.f;
 		_HP = 80.f;
@@ -171,9 +173,15 @@ float Enemy::GetExperienceValue()const
 {
 	return _experienceValue;
 }
+
 int Enemy::GetScoreValue()const
 {
 	return _scoreValue;
+}
+
+float Enemy::GetHealValue()const
+{
+	return _healValue;
 }
 
 bool Enemy::IsVisible()
