@@ -1,11 +1,11 @@
 #pragma once
 #include"GameObject.h"
 #include"UI.h"
+#include"Enemy.h"
 
 #include <string>
 
 class Player;
-class Enemy;
 class Projectile;
 class Pickup;
 
@@ -43,17 +43,37 @@ public:
 	UIManager& GetUIManager();
 
 private:
+	struct TimedEffect
+	{
+		sf::Sprite sprite;
+		float remaining;
+
+		TimedEffect(const sf::Texture& texture, sf::Vector2f position)
+			: sprite(texture), remaining(0.2f)
+		{
+			sprite.setOrigin(sprite.getGlobalBounds().size / 2.f);
+			sprite.setPosition(position);
+			sprite.setScale({ 2.f, 2.f });
+		}
+	};
 	
 	sf::Vector2f GetRandomSpawnPosition()const;
 	void UpdateSpawning(float deltaTime);
+	const sf::Texture& GetEnemyTexture(EnemyType type)const;
 	
 	std::unique_ptr<Player> _player;
 	std::vector<std::unique_ptr<Enemy>> _enemies;
 	std::vector<std::unique_ptr<Projectile>> _projectiles;
 	std::vector<std::unique_ptr<Pickup>> _pickups;
-	sf::Texture _pickupTexture;
-	sf::Texture _enemyTexture;
+	std::vector<TimedEffect> _effects;
+	sf::Texture _pickupExperienceTexture;
+	sf::Texture _pickupHealthTexture;
+	sf::Texture _enemyBasicTexture;
+	sf::Texture _enemyRangedTexture;
+	sf::Texture _enemyBomberTexture;
+	sf::Texture _enemyGiantTexture;
 	sf::Texture _enemyProjectileTexture;
+	sf::Texture _explosionTexture;
 
 	float _gameTime = 0.f;
 	float _spawnTimer = 0.f;

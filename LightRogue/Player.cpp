@@ -4,12 +4,13 @@
 #include"Enemy.h"
 #include"Projectile.h"
 #include"Pickup.h"
+#include"ResourceLoader.h"
+#include"Facing.h"
 
 Player::Player(const sf::Texture& texture,GameWorld* gameWorld, sf::RenderWindow* mainWindow) :GameObject(texture),_gameWorld(gameWorld),_mainWindow(mainWindow)
 {
 	_sprite.setOrigin(_sprite.getGlobalBounds().size/2.f);
-	sf::Image projectileImage({ 8,8 }, sf::Color::Cyan);
-	assert(_projectileTexture.loadFromImage(projectileImage));
+	LoadTextureFromResource(_projectileTexture, "bullet_player.png");
 
 }
 
@@ -41,6 +42,9 @@ void Player::Update(float deltaTime)
 	{
 		_sprite.move({ _speed * deltaTime, 0.f });
 	}
+	const float mouseDirectionX = static_cast<float>(sf::Mouse::getPosition(*_mainWindow).x) - GetPosition().x;
+	const sf::Vector2f playerScale = _sprite.getScale();
+	_sprite.setScale({ ResolveFacingScaleX(mouseDirectionX, playerScale.x, true), playerScale.y }); // Face the player toward the mouse while preserving the original scale.
 	//check HP
 	if (_HP <= 0.f)
 		Destroy();

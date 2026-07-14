@@ -3,6 +3,7 @@
 #include"Game.h"
 #include"Player.h"
 #include"Projectile.h"
+#include"Facing.h"
 
 Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :GameObject(texture),_gameWorld(gameWorld),_type(type)
 {
@@ -30,7 +31,6 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_shootCooldown = 1.5f;
 		_shootDamage = 10.f;
 		_shootSpeed = 250.f;
-		_sprite.setColor(sf::Color(100, 150, 255));
 		break;
 	case EnemyType::Bomber:
 		_maxHP = 15.f;
@@ -40,7 +40,6 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_experienceValue = 10.f;
 		_scoreValue = 3;
 		_bombRadius = 30.f;
-		_sprite.setColor(sf::Color(255, 150, 50));
 		break;
 	case EnemyType::Giant:
 		_maxHP = 750.f;
@@ -50,8 +49,7 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_experienceValue = 50.f;
 		_scoreValue = 10;
 		_healValue = 30.f;
-		_sprite.setScale({ 3.f, 3.f });
-		_sprite.setColor(sf::Color(200, 80, 200));
+		_sprite.setScale({ 1.5f, 1.5f });
 		break;
 	case EnemyType::Elite:
 		_maxHP = 80.f;
@@ -61,6 +59,7 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_experienceValue = 10.f;
 		_scoreValue = 3;
 		_sprite.setScale({ 1.1f, 1.1f });
+		_sprite.setColor(sf::Color(255, 220, 140));
 		break;
 	}
 }
@@ -76,6 +75,8 @@ void Enemy::Update(float deltaTime)
 
 	sf::Vector2f direction = _target->GetPosition() - GetPosition();
 	float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+	const sf::Vector2f enemyScale = _sprite.getScale();
+	_sprite.setScale({ ResolveFacingScaleX(direction.x, enemyScale.x, false), enemyScale.y }); // Face the enemy toward the player while preserving giant and elite scale factors.
 
 	switch (_type)
 	{

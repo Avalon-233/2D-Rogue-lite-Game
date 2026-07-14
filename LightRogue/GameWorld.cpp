@@ -6,17 +6,18 @@
 #include "Projectile.h"
 #include "Pickup.h"
 #include"Game.h"
+#include"ResourceLoader.h"
 
 GameWorld::GameWorld()
 {
-
-
-	sf::Image pickupImage({ 16,16 }, sf::Color::Yellow);
-	assert(_pickupTexture.loadFromImage(pickupImage));
-	sf::Image enemyImage({ 32,32 }, sf::Color::Red);
-	assert(_enemyTexture.loadFromImage(enemyImage));
-	sf::Image projImage({ 8,8 }, sf::Color(200, 100, 100));
-	assert(_enemyProjectileTexture.loadFromImage(projImage));
+	LoadTextureFromResource(_pickupExperienceTexture, "pickup_experience.png");
+	LoadTextureFromResource(_pickupHealthTexture, "pickup_health.png");
+	LoadTextureFromResource(_enemyBasicTexture, "enemy_basic.png");
+	LoadTextureFromResource(_enemyRangedTexture, "enemy_ranged.png");
+	LoadTextureFromResource(_enemyBomberTexture, "enemy_bomber.png");
+	LoadTextureFromResource(_enemyGiantTexture, "enemy_giant.png");
+	LoadTextureFromResource(_enemyProjectileTexture, "bullet_enemy.png");
+	LoadTextureFromResource(_explosionTexture, "effect_explosion.png");
 }
 
 GameWorld::~GameWorld()
@@ -59,6 +60,8 @@ void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 		it->Draw(renderWindow);
 	for (auto& it : _pickups)
 		it->Draw(renderWindow);
+	for (auto& effect : _effects)
+		renderWindow.draw(effect.sprite);
 
 	DrawUI(renderWindow);
 }
@@ -73,6 +76,14 @@ void GameWorld::UpdateAll(float deltaTime)
 		it->Update(deltaTime);
 	for (auto& it : _pickups)
 		it->Update(deltaTime);
+	for (auto it = _effects.begin(); it != _effects.end();)
+	{
+		it->remaining -= deltaTime;
+		if (it->remaining <= 0.f)
+			it = _effects.erase(it);
+		else
+			++it;
+	}
 }
 
 void GameWorld::Collision()
@@ -129,7 +140,11 @@ void GameWorld::CleanUp()
 		{
 			Game::GetEventManager().Emit(EnemyKilled{});
 			_scoreCounter += (*itEnemy)->GetScoreValue();
-			auto pickup = std::make_unique<Pickup>(_pickupTexture, (*itEnemy)->GetExperienceValue(), (*itEnemy)->GetHealValue());
+			const sf::Vector2f deathPosition = (*itEnemy)->GetPosition();
+			_effects.emplace_back(_explosionTexture, deathPosition);
+			const sf::Texture& pickupTexture = (*itEnemy)->GetHealValue() > 0.f
+				? _pickupHealthTexture : _pickupExperienceTexture;
+			auto pickup = std::make_unique<Pickup>(pickupTexture, (*itEnemy)->GetExperienceValue(), (*itEnemy)->GetHealValue());
 			pickup->SetPosition((*itEnemy)->GetPosition().x, (*itEnemy)->GetPosition().y);
 			Add(std::move(pickup));
 			itEnemy = _enemies.erase(itEnemy);
@@ -177,7 +192,7 @@ void GameWorld::UpdateSpawning(float deltaTime)
 	//120s Giant begin to approach
 	if (_gameTime >= 120.f && _gameTime - deltaTime < 120.f)
 	{
-		auto giant = std::make_unique<Enemy>(_enemyTexture, this, EnemyType::Giant);
+		auto giant = std::make_unique<Enemy>(GetEnemyTexture(EnemyType::Giant), this, EnemyType::Giant);
 		auto pos = GetRandomSpawnPosition();
 		giant->SetPosition(pos.x, pos.y);
 		giant->SetTarget(_player.get());
@@ -258,12 +273,25 @@ void GameWorld::UpdateSpawning(float deltaTime)
 			else
 				type = EnemyType::Giant;
 		}
-		auto enemy = std::make_unique<Enemy>(_enemyTexture,this,type);
+		auto enemy = std::make_unique<Enemy>(GetEnemyTexture(type),this,type);
 		auto position = GetRandomSpawnPosition();
 		enemy->SetPosition(position.x,position.y);
 		enemy->SetTarget(_player.get());
 		Add(std::move(enemy));
 		_spawnTimer = 0.f;
+	}
+}
+
+const sf::Texture& GameWorld::GetEnemyTexture(EnemyType type)const
+{
+	switch (type)
+	{
+	case EnemyType::Ranged: return _enemyRangedTexture;
+	case EnemyType::Bomber: return _enemyBomberTexture;
+	case EnemyType::Giant:  return _enemyGiantTexture;
+	case EnemyType::Basic:
+	case EnemyType::Elite:
+	default:                return _enemyBasicTexture;
 	}
 }
 

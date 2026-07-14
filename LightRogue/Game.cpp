@@ -1,6 +1,7 @@
 #include"stdafx.h"
 #include"GameObject.h"
 #include"Game.h"
+#include"ResourceLoader.h"
 
 void Game::HandleEvent(const sf::Event::Closed&)
 {
@@ -131,8 +132,8 @@ void Game::Start()
 	_clock.restart();
 	
 	//Create a player
-	sf::Image image({ 32,32 }, sf::Color::Green);
-	sf::Texture playerTexture(image);
+	sf::Texture playerTexture;
+	LoadTextureFromResource(playerTexture, "player.png");
 	std::unique_ptr<Player> player = std::make_unique<Player>(playerTexture,&_gameWorld,&_mainWindow);
 	player->SetPosition(512.f, 384.f);
 	_gameWorld.Add(std::move(player));
