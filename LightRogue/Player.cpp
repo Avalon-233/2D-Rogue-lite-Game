@@ -10,6 +10,7 @@ Player::Player(const sf::Texture& texture,GameWorld* gameWorld, sf::RenderWindow
 	_sprite.setOrigin(_sprite.getGlobalBounds().size/2.f);
 	sf::Image projectileImage({ 8,8 }, sf::Color::Cyan);
 	assert(_projectileTexture.loadFromImage(projectileImage));
+
 }
 
 Player::~Player()

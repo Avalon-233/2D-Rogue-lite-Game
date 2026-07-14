@@ -43,7 +43,14 @@ void GameWorld::Add(std::unique_ptr<Pickup> pickup)
 
 void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 {
-	if(_player)_player->Draw(renderWindow);
+	{
+		if (_player)_player->Draw(renderWindow);
+		sf::CircleShape Vision(_player->GetVision(),200);
+		Vision.setOrigin({ _player->GetVision(), _player->GetVision() });
+		Vision.setPosition(_player->GetPosition());
+		Vision.setFillColor(sf::Color(255, 255, 255, 128));
+		renderWindow.draw(Vision);
+	}
 	for(auto& it : _enemies)
 		it->Draw(renderWindow);
 	for (auto& it : _projectiles)
