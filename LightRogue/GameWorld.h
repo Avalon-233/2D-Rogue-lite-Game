@@ -2,6 +2,8 @@
 #include"GameObject.h"
 #include"UI.h"
 #include"Enemy.h"
+#include "SoundManager.h" 
+#include "SaveData.h" 
 
 #include <string>
 
@@ -14,6 +16,9 @@ class GameWorld
 public:
 	GameWorld();
 	~GameWorld();
+
+	void SaveGame()const;
+	bool LoadGame();
 	
 	void Add(std::unique_ptr<Player> player);
 	void Add(std::unique_ptr<Enemy> enemy);
@@ -41,6 +46,7 @@ public:
 	const sf::Texture& GetEnemyProjectileTexture() const;
 	std::string GetUpgradePrompt()const;
 	UIManager& GetUIManager();
+	SoundManager& GetSoundManager();
 
 private:
 	struct TimedEffect
@@ -66,6 +72,8 @@ private:
 	std::vector<std::unique_ptr<Projectile>> _projectiles;
 	std::vector<std::unique_ptr<Pickup>> _pickups;
 	std::vector<TimedEffect> _effects;
+
+	sf::Texture _backgroundTexture;
 	sf::Texture _pickupExperienceTexture;
 	sf::Texture _pickupHealthTexture;
 	sf::Texture _enemyBasicTexture;
@@ -78,7 +86,7 @@ private:
 	float _gameTime = 0.f;
 	float _spawnTimer = 0.f;
 	const int MAX_ENEMIES_COUNT = 50;
-	float _minInterval = 0.45f;
+	float _minInterval = 0.35f;
 	float _baseInterval = 2.5f;
 	float _decayRate = 0.025f;
 	float _gameTimeLimit = 360.f;
@@ -86,5 +94,6 @@ private:
 	int _scoreCounter = 0;
 
 	UIManager _uiManager;
+	SoundManager  _soundManager;
 	
 };

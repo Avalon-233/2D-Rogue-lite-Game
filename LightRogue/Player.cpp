@@ -132,40 +132,19 @@ void Player::AddExperience(float experience)
 	CheckLevelUp();
 }
 
-float Player::GetVision()const
-{
-	return _visionRadius;
-}
-
-float Player::GetSpeed()const
-{
-	return _speed;
-}
-
-float Player::GetHP()const
-{
-	return _HP;
-}
-
-float Player::GetMaxHP()const
-{
-	return _maxHP;
-}
-
-float Player::GetExperience()const
-{
-	return _experience;
-}
-
-float Player::GetExperienceNeeded()const
-{
-	return _level * 10.f * _experienceNeedMultiplier;
-}
-
-int Player::GetLevel()const
-{
-	return _level;
-}
+float Player::GetVision()const {return _visionRadius;}
+float Player::GetSpeed()const {return _speed;}
+float Player::GetHP()const {return _HP;}
+float Player::GetMaxHP()const {return _maxHP;}
+float Player::GetExperience()const {return _experience;}
+float Player::GetExperienceNeeded()const {return _level * 10.f * _experienceNeedMultiplier;}
+int Player::GetLevel()const {return _level;}
+float Player::GetShootDamage()const { return _shootDamage; }
+float Player::GetShootSpeed()const { return _shootSpeed; }
+float Player::GetShootCooldown()const { return _shootCooldown; }
+int Player::GetProjectileCount()const { return _projectileCount; }
+int Player::GetPendingUpgradeCount()const { return _pendingUpgradeCount; }
+float Player::GetExperienceNeedMultiplier()const { return _experienceNeedMultiplier; }
 
 bool Player::HasPendingUpgrade()const
 {
@@ -266,4 +245,20 @@ void Player::ApplyUpgradeType(UpgradeType upgradeType)
 	default:
 		break;
 	}
+}
+
+void Player::ApplySaveData(const SaveData& d)
+{
+	_HP = d.HP;
+	_maxHP = d.maxHP;
+	_sprite.setPosition({ d.position_x, d.position_y });
+	_speed = d.speed;
+	_shootDamage = d.shootDamage;
+	_shootSpeed = d.shootSpeed;
+	_shootCooldown = d.shootCooldown;
+	_projectileCount = d.projectileCount;
+	_experience = d.experience;
+	_experienceNeedMultiplier = d.experienceNeedMultiplier;
+	_level = d.level;
+	_pendingUpgradeCount = d.pendingUpgradeCount;
 }

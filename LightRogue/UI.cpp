@@ -2,6 +2,7 @@
 #include "UI.h"
 #include "Player.h"
 #include "Enemy.h"
+#include"ResourceLoader.h"
 
 void UIManager::ActivateOverlay(GameState state)
 {
@@ -61,10 +62,7 @@ void UIManager::OnGameOverEnter(float time, int score, int level)
 }
 void SplashOverlayUI::LoadResources()
 {
-    _backgroundReady =
-        _backgroundTexture.loadFromFile("resource/SplashScreen.png") ||
-        _backgroundTexture.loadFromFile("../resource/SplashScreen.png") ||
-        _backgroundTexture.loadFromFile("../../resource/SplashScreen.png");
+    _backgroundReady = LoadTextureFromResource(_backgroundTexture, "SplashScreen.png");
 
     if (_backgroundReady)
         _backgroundTexture.setSmooth(true);
@@ -250,12 +248,12 @@ void PauseOverlayUI::Draw(sf::RenderWindow& window)
     CenterText(subtitle, { center.x, center.y - 100.f });
     window.draw(subtitle);
 
-    // Continue 按钮
+    // Continue button
     DrawAnimatedButton(window, GetContinueButtonBounds(window),
         _continueHovered, "CONTINUE",
         sf::Color(255, 205, 90), sf::Color(255, 220, 120), 0.f, _font);
 
-    // Quit 按钮
+    // Quit button
     DrawAnimatedButton(window, GetQuitButtonBounds(window),
         _quitHovered, "QUIT GAME",
         sf::Color(180, 80, 60), sf::Color(220, 100, 80), 1.f, _font);

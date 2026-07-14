@@ -30,26 +30,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -154,12 +154,14 @@
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="SaveManager.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enemy.h" />
-	<ClInclude Include="Facing.h" />
+    <ClInclude Include="Facing.h" />
     <ClInclude Include="GameEvent.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -167,11 +169,15 @@
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
-	<ClInclude Include="ResourceLoader.h" />
+    <ClInclude Include="ResourceLoader.h" />
+    <ClInclude Include="SaveData.h" />
+    <ClInclude Include="SaveManager.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UI.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\resource\background.png" />
     <Image Include="..\resource\bullet_enemy.png" />
     <Image Include="..\resource\bullet_player.png" />
     <Image Include="..\resource\effect_explosion.png" />
@@ -183,6 +189,15 @@
     <Image Include="..\resource\pickup_health.png" />
     <Image Include="..\resource\player.png" />
     <Image Include="..\resource\SplashScreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\resource\BGM.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\resource\enemydamaged.wav" />
+    <Media Include="..\resource\levelup.wav" />
+    <Media Include="..\resource\playerdamaged.wav" />
+    <Media Include="..\resource\shoot.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

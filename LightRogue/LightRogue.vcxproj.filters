@@ -45,6 +45,12 @@
     <ClCompile Include="UI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -75,6 +81,21 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="GameEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Facing.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -112,5 +133,27 @@
     <Image Include="..\resource\player.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="..\resource\background.png">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\resource\BGM.ogg">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\resource\enemydamaged.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="..\resource\levelup.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="..\resource\playerdamaged.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="..\resource\shoot.wav">
+      <Filter>资源文件</Filter>
+    </Media>
   </ItemGroup>
 </Project>

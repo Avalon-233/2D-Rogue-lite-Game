@@ -30,9 +30,17 @@ public:
 	float GetExperience()const;
 	float GetExperienceNeeded()const;
 	int GetLevel()const;
+	float GetShootDamage()const;
+	float GetShootSpeed()const;
+	float GetShootCooldown()const;
+	int GetProjectileCount()const;
+	int GetPendingUpgradeCount() const;
+	float GetExperienceNeedMultiplier() const;
 	bool HasPendingUpgrade()const;
 	void ApplyUpgradeOption(int option);
 	const std::array<int, 3>& GetCurrentUpgradeOptions()const;
+
+	void  ApplySaveData(const SaveData& d);
 
 private:
 	enum UpgradeType

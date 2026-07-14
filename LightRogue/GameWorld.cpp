@@ -7,6 +7,7 @@
 #include "Pickup.h"
 #include"Game.h"
 #include"ResourceLoader.h"
+#include "SaveManager.h"
 
 GameWorld::GameWorld()
 {
@@ -18,11 +19,46 @@ GameWorld::GameWorld()
 	LoadTextureFromResource(_enemyGiantTexture, "enemy_giant.png");
 	LoadTextureFromResource(_enemyProjectileTexture, "bullet_enemy.png");
 	LoadTextureFromResource(_explosionTexture, "effect_explosion.png");
+	LoadTextureFromResource(_backgroundTexture, "background.png");
 }
 
 GameWorld::~GameWorld()
 {
 }
+
+void GameWorld::SaveGame() const
+{
+	if (!_player) return;
+	SaveData d;
+	d.HP = _player->GetHP();
+	d.maxHP = _player->GetMaxHP();
+	d.position_x = _player->GetPosition().x;
+	d.position_y = _player->GetPosition().y;
+	d.speed = _player->GetSpeed();
+	d.shootDamage = _player->GetShootDamage();
+	d.shootSpeed = _player->GetShootSpeed();
+	d.shootCooldown = _player->GetShootCooldown();
+	d.projectileCount = _player->GetProjectileCount();
+	d.experience = _player->GetExperience();
+	d.experienceNeedMultiplier = _player->GetExperienceNeedMultiplier();
+	d.level = _player->GetLevel();
+	d.pendingUpgradeCount = _player->GetPendingUpgradeCount();
+	d.gameTime = _gameTime;
+	d.score = _scoreCounter;
+	SaveManager::Save(d);
+}
+
+bool GameWorld::LoadGame()
+{
+	SaveData d;
+	if (!SaveManager::Load(d)) return false;
+	if (!_player) return false;
+	_player->ApplySaveData(d);
+	_gameTime = d.gameTime;
+	_scoreCounter = d.score;
+	return true;
+}
+
 
 void GameWorld::Add(std::unique_ptr<Player> player)
 {
@@ -46,14 +82,15 @@ void GameWorld::Add(std::unique_ptr<Pickup> pickup)
 
 void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 {
-	{
-		if (_player)_player->Draw(renderWindow);
-		sf::CircleShape Vision(_player->GetVision(),200);
-		Vision.setOrigin({ _player->GetVision(), _player->GetVision() });
-		Vision.setPosition(_player->GetPosition());
-		Vision.setFillColor(sf::Color(255, 255, 255, 128));
-		renderWindow.draw(Vision);
-	}
+	sf::Sprite _background(_backgroundTexture);
+	renderWindow.draw(_background);
+	if (_player)_player->Draw(renderWindow);
+	sf::CircleShape Vision(_player->GetVision(),200);
+	Vision.setOrigin({ _player->GetVision(), _player->GetVision() });
+	Vision.setPosition(_player->GetPosition());
+	Vision.setFillColor(sf::Color(255, 255, 255,64));
+	renderWindow.draw(Vision);
+
 	for(auto& it : _enemies)
 		it->Draw(renderWindow);
 	for (auto& it : _projectiles)
@@ -298,7 +335,7 @@ const sf::Texture& GameWorld::GetEnemyTexture(EnemyType type)const
 sf::Vector2f GameWorld::GetRandomSpawnPosition()const
 {
 	const float margin = 40.f;
-	const float w = 1024.f, h = 768.f;
+	const float w = 1440.f, h = 810.f;
 
 	int side = rand() % 4;
 	switch (side)
@@ -404,4 +441,9 @@ std::string GameWorld::GetUpgradePrompt()const
 UIManager& GameWorld::GetUIManager()
 {
 	return _uiManager;
+}
+
+SoundManager& GameWorld::GetSoundManager()
+{ 
+	return _soundManager;
 }

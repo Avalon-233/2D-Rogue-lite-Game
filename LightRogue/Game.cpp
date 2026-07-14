@@ -81,6 +81,13 @@ void Game::ProcessEvents()
 
 				if (event.gameState == Paused)
 					_gameWorld.GetUIManager().OnPauseEnter();
+
+				if (event.gameState == Playing)
+					_gameWorld.GetSoundManager().PlayBGM();
+				else if(event.gameState == Paused)
+					_gameWorld.GetSoundManager().PauseBGM();
+				else if (event.gameState == GameOver)
+					_gameWorld.GetSoundManager().StopBGM();
 			}
 			else if constexpr (std::is_same_v<T, LevelUp>)
 			{
@@ -89,6 +96,7 @@ void Game::ProcessEvents()
 					_gameWorld.GetUIManager().OnUpgradeEnter(_gameWorld.GetPlayerUpgradeOptions());
 					_eventManager.Emit(GameStateChange{ Upgrading });
 				}
+				_gameWorld.GetSoundManager().PlayLevelUp();
 			}
 			else if constexpr (std::is_same_v<T, UpgradeSelected>)
 			{
@@ -98,15 +106,15 @@ void Game::ProcessEvents()
 			}
 			else if constexpr (std::is_same_v<T, PlayerDamaged>)
 			{
-				
+				_gameWorld.GetSoundManager().PlayPlayerDamaged();
 			}
 			else if constexpr (std::is_same_v<T, PlayerShoot>)
 			{
-
+				_gameWorld.GetSoundManager().PlayPlayerShoot();
 			}
 			else if constexpr (std::is_same_v<T, EnemyDamaged>)
 			{
-
+				_gameWorld.GetSoundManager().PlayEnemyDamaged();
 			}
 			else if constexpr (std::is_same_v<T, EnemyKilled>)
 			{
@@ -121,13 +129,16 @@ void Game::Start()
 	if (_gameState != Uninitialized)
 		return;
 
-	_mainWindow.create(sf::VideoMode({ 1024, 768 }, 32), "LightRogue");
+	_mainWindow.create(sf::VideoMode({ 1440, 810 }, 32), "LightRogue");
 	_gameState = GameState::ShowingSplash;
 	_mainWindow.setVerticalSyncEnabled(true);
 	_mainWindow.setKeyRepeatEnabled(false);
 	_gameWorld.GetUIManager().LoadOverlayResources();
+	_gameWorld.GetSoundManager().LoadAll();
 	_gameWorld.GetUIManager().OnSplashEnter();
 	_gameWorld.GetUIManager().ActivateOverlay(GameState::ShowingSplash);
+
+	_gameWorld.GetSoundManager().PlayBGM();
 
 	_clock.restart();
 	
@@ -135,7 +146,7 @@ void Game::Start()
 	sf::Texture playerTexture;
 	LoadTextureFromResource(playerTexture, "player.png");
 	std::unique_ptr<Player> player = std::make_unique<Player>(playerTexture,&_gameWorld,&_mainWindow);
-	player->SetPosition(512.f, 384.f);
+	player->SetPosition(720.f, 405.f);
 	_gameWorld.Add(std::move(player));
 
 	while (!IsExiting())
