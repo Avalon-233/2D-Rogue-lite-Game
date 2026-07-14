@@ -162,7 +162,7 @@ void SplashOverlayUI::Draw(sf::RenderWindow& window)
     CenterText(title, { center.x, 150.f });
     window.draw(title);
 
-    sf::Text subtitle(_font, "ESC exits. Any other key starts.", 24);
+    sf::Text subtitle(_font, "ESC exits. Click the button starts.", 24);
     subtitle.setFillColor(sf::Color(200, 215, 235));
     CenterText(subtitle, { center.x, 220.f });
     window.draw(subtitle);
