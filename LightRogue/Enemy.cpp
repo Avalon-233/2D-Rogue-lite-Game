@@ -14,7 +14,7 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_maxHP = 40.f;
 		_HP = 40.f;
 		_damage = 10.f;
-		_speed = 60.f;
+		_speed = 50.f;
 		_experienceValue = 5.f;
 		_scoreValue = 1;
 		break;
@@ -22,7 +22,7 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_maxHP = 25.f;
 		_HP = 25.f;
 		_damage = 5.f;
-		_speed = 50.f;
+		_speed = 40.f;
 		_experienceValue = 8.f;
 		_scoreValue = 2;
 		_shootRange = 250.f;
@@ -43,14 +43,23 @@ Enemy::Enemy(const sf::Texture& texture, GameWorld* gameWorld, EnemyType type) :
 		_sprite.setColor(sf::Color(255, 150, 50));
 		break;
 	case EnemyType::Giant:
-		_maxHP = 500.f;
-		_HP = 500.f;
+		_maxHP = 750.f;
+		_HP = 750.f;
 		_damage = 45.f;
-		_speed = 35.f;
+		_speed = 25.f;
 		_experienceValue = 30.f;
 		_scoreValue = 10;
 		_sprite.setScale({ 3.f, 3.f });
 		_sprite.setColor(sf::Color(200, 80, 200));
+	case EnemyType::Elite:
+		_maxHP = 80.f;
+		_HP = 80.f;
+		_damage = 20.f;
+		_speed = 70.f;
+		_experienceValue = 10.f;
+		_scoreValue = 3;
+		_sprite.setScale({ 1.1f, 1.1f });
+		break;
 	}
 }
 
@@ -69,6 +78,20 @@ void Enemy::Update(float deltaTime)
 	switch (_type)
 	{
 	case EnemyType::Basic:
+		if (length > 0.f)
+		{
+			direction /= length;
+			_sprite.move(direction * _speed * deltaTime);
+		}
+		break;
+	case EnemyType::Elite:
+		if (length > 0.f)
+		{
+			direction /= length;
+			_sprite.move(direction * _speed * deltaTime);
+		}
+		break;
+	case EnemyType::Giant:
 		if (length > 0.f)
 		{
 			direction /= length;

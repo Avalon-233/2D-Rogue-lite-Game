@@ -60,7 +60,7 @@ private:
 	const int MAX_ENEMIES_COUNT = 50;
 	float _minInterval = 0.45f;
 	float _baseInterval = 2.5f;
-	float _decayRate = 0.03f;
+	float _decayRate = 0.025f;
 	float _gameTimeLimit = 360.f;
 
 	int _scoreCounter = 0;

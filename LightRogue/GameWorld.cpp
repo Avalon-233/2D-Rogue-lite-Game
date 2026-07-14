@@ -241,7 +241,7 @@ void GameWorld::UpdateSpawning(float deltaTime)
 		{
 			float roll = static_cast<float>(rand()) / RAND_MAX;
 			if (roll < 0.35f)
-				type = EnemyType::Basic;
+				type = EnemyType::Elite;
 			else if (roll < 0.70f)
 				type = EnemyType::Ranged;
 			else if (roll < 0.95f)

@@ -5,7 +5,7 @@ class Player;
 class Projectile;
 class GameWorld;
 
-enum EnemyType { Basic, Ranged, Bomber, Giant };
+enum EnemyType { Basic,Elite, Ranged, Bomber, Giant };
 
 class Enemy :public GameObject
 {

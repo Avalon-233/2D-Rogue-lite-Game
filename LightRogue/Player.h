@@ -14,6 +14,7 @@ public:
 	Player(const sf::Texture& texture,GameWorld* gameWorld, sf::RenderWindow* mainWindow);
 	~Player();
 
+	bool IsVisible() override;
 	void Update(float deltaTime)override;
 	void HandleCollision(Enemy* enemy);
 	void HandleCollision(Projectile* projectile);
@@ -73,4 +74,11 @@ private:
 
 	//vision about
 	float _visionRadius = 300.f;
+
+	//invincible about
+	float _invincibleTimer = 0.f;
+	float _invincibleDuration = 1.2f;
+	float _flashTimer = 0.f;
+	float _flashInterval = 0.1f;
+	bool  _flashVisible = true;
 };

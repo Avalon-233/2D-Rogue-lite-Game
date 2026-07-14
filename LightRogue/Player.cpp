@@ -16,6 +16,11 @@ Player::~Player()
 {
 }
 
+bool Player::IsVisible()
+{
+	return _flashVisible;
+}
+
 void Player::Update(float deltaTime)
 {
 	//move
@@ -40,6 +45,18 @@ void Player::Update(float deltaTime)
 		Destroy();
 	if (_HP > _maxHP)
 		_HP = _maxHP;
+	if (_invincibleTimer <=_invincibleDuration)
+	{
+		_invincibleTimer += deltaTime;
+		_flashTimer += deltaTime;
+		if (_flashTimer >= _flashInterval)
+		{
+			_flashTimer -= _flashInterval;
+			_flashVisible = !_flashVisible;
+		}
+		if (_invincibleTimer > _invincibleDuration)
+			_flashVisible = true;
+	}
 	//shoot
 	_shootTimer += deltaTime;
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
@@ -54,14 +71,17 @@ void Player::Update(float deltaTime)
 
 void Player::HandleCollision(Enemy* enemy)
 {
+	if (_invincibleTimer <= _invincibleDuration)return;
 	_HP -= enemy->GetDamage();
+	_invincibleTimer = 0.f;
 	Game::GetEventManager().Emit(PlayerDamaged{});
 }
 
 void Player::HandleCollision(Projectile* projectile)
 {
-	
+	if (_invincibleTimer <= _invincibleDuration)return;
 	_HP-= projectile->GetDamage();
+	_invincibleTimer = 0.f;
 	Game::GetEventManager().Emit(PlayerDamaged{});
 	
 }
