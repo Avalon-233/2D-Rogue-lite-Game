@@ -97,6 +97,7 @@ void Player::HandleCollision(Pickup* pickup)
 void Player::Shoot(sf::Vector2i position)
 {
 	//create a projectile and Add() it
+	Game::GetEventManager().Emit(PlayerShoot{});
 	sf::Vector2f distance = { position.x*1.f - GetPosition().x,position.y*1.f - GetPosition().y };
 	if (distance.x ==0.&&distance.y== 0.f)return;
 	sf::Vector2f direction = distance.normalized();

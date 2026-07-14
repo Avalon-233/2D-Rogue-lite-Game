@@ -6,12 +6,13 @@ enum GameState { Uninitialized, ShowingSplash, Paused, ShowingMenu, Playing, Exi
 
 struct LevelUp { int newlevel; };
 struct UpgradeSelected { int option; };
-struct MouseClicked { int x;int y; GameState gameState; };
 struct GameStateChange { GameState gameState; };
 struct PlayerDamaged {};
+struct PlayerShoot {};
+struct EnemyDamaged {};
 struct EnemyKilled {};
 
-using GameEvent = std::variant<LevelUp, MouseClicked, GameStateChange,UpgradeSelected, PlayerDamaged, EnemyKilled>;
+using GameEvent = std::variant<LevelUp, GameStateChange,UpgradeSelected, PlayerDamaged, PlayerShoot, EnemyDamaged, EnemyKilled>;
 
 class EventManager
 {

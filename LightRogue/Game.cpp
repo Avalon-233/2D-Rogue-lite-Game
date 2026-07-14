@@ -95,13 +95,17 @@ void Game::ProcessEvents()
 				if (!_gameWorld.HasPendingUpgrade())
 					_eventManager.Emit(GameStateChange{Playing});
 			}
-			else if constexpr (std::is_same_v<T, MouseClicked>)
-			{
-
-			}
 			else if constexpr (std::is_same_v<T, PlayerDamaged>)
 			{
 				
+			}
+			else if constexpr (std::is_same_v<T, PlayerShoot>)
+			{
+
+			}
+			else if constexpr (std::is_same_v<T, EnemyDamaged>)
+			{
+
 			}
 			else if constexpr (std::is_same_v<T, EnemyKilled>)
 			{

@@ -142,6 +142,7 @@ void Enemy::HandleCollision(Player* player)
 
 void Enemy::HandleCollision(Projectile* projectile)
 {
+	Game::GetEventManager().Emit(EnemyDamaged{});
 	_isShooted = true;
 	_visibleTimer.restart();
 	_HP -= projectile->GetDamage();

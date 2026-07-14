@@ -170,6 +170,16 @@
     <ClInclude Include="UI.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\resource\bullet_enemy.png" />
+    <Image Include="..\resource\bullet_player.png" />
+    <Image Include="..\resource\effect_explosion.png" />
+    <Image Include="..\resource\enemy_basic.png" />
+    <Image Include="..\resource\enemy_bomber.png" />
+    <Image Include="..\resource\enemy_giant.png" />
+    <Image Include="..\resource\enemy_ranged.png" />
+    <Image Include="..\resource\pickup_experience.png" />
+    <Image Include="..\resource\pickup_health.png" />
+    <Image Include="..\resource\player.png" />
     <Image Include="..\resource\SplashScreen.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

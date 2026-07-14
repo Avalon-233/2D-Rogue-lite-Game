@@ -9,6 +9,8 @@
 
 GameWorld::GameWorld()
 {
+
+
 	sf::Image pickupImage({ 16,16 }, sf::Color::Yellow);
 	assert(_pickupTexture.loadFromImage(pickupImage));
 	sf::Image enemyImage({ 32,32 }, sf::Color::Red);

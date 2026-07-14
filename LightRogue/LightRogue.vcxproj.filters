@@ -82,5 +82,35 @@
     <Image Include="..\resource\SplashScreen.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="..\resource\bullet_enemy.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\bullet_player.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\effect_explosion.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\enemy_basic.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\enemy_bomber.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\enemy_giant.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\enemy_ranged.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\pickup_experience.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\pickup_health.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\resource\player.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>
