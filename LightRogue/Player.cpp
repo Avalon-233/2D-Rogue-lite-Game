@@ -42,7 +42,8 @@ void Player::Update(float deltaTime)
 	{
 		_sprite.move({ _speed * deltaTime, 0.f });
 	}
-	const float mouseDirectionX = static_cast<float>(sf::Mouse::getPosition(*_mainWindow).x) - GetPosition().x;
+	sf::Vector2f mouseWorld = _mainWindow->mapPixelToCoords(sf::Mouse::getPosition(*_mainWindow));
+	const float mouseDirectionX = mouseWorld.x - GetPosition().x;
 	const sf::Vector2f playerScale = _sprite.getScale();
 	_sprite.setScale({ ResolveFacingScaleX(mouseDirectionX, playerScale.x, true), playerScale.y }); // Face the player toward the mouse while preserving the original scale.
 	//check HP

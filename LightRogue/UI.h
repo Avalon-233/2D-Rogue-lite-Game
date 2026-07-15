@@ -185,6 +185,7 @@ public:
     void UpdateOverlayHover(const sf::RenderWindow& window,sf::Vector2i position);
     int  HitTestOverlay(const sf::RenderWindow& window,sf::Vector2i position) const;
     void DrawOverlay(sf::RenderWindow& window);
+    void DrawFPS(sf::RenderWindow& window, int fps);
     void ActivateOverlay(GameState state);
     void SetSplashHasSaveFile(bool v) { _splashUI.SetHasSaveFile(v); }
 
@@ -204,6 +205,7 @@ private:
 
     StatusBar _playerHealthBar;
     StatusBar _playerExperienceBar;
-    
+    sf::Font _hudFont;
+    bool     _hudFontReady = false;
 
 };

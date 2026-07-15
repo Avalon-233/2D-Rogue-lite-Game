@@ -176,7 +176,7 @@ void Game::Start()
 	if (_gameState != Uninitialized)
 		return;
 
-	_mainWindow.create(sf::VideoMode({ 1440, 810 }, 32), "LightRogue");
+	_mainWindow.create(sf::VideoMode({ 1440, 810 }), "LightRogue");
 	_gameState = GameState::ShowingSplash;
 	_view = sf::View(sf::FloatRect({ 0.f, 0.f }, { 1440.f, 810.f }));
 	_mainWindow.setView(_view);
@@ -221,6 +221,9 @@ void Game::GameLoop()
 
 	float deltaTime = _clock.restart().asSeconds();
 	if (deltaTime > 0.1f) deltaTime = 0.1f;
+	float FPS = 1.f / deltaTime;
+	if (_smoothFPS)_smoothFPS = _smoothFPS * 0.9f + FPS * 0.1f;
+	else _smoothFPS = FPS;
 
 	if (_gameState == Playing)
 	{
@@ -247,6 +250,7 @@ void Game::GameLoop()
 	else
 	{
 		_gameWorld.DrawAll(_mainWindow);
+		_gameWorld.GetUIManager().DrawFPS(_mainWindow, static_cast<int>(_smoothFPS));
 		if (_gameState != Playing)
 			_gameWorld.GetUIManager().DrawOverlay(_mainWindow);
 	}
@@ -296,3 +300,4 @@ sf::Clock Game::_clock;
 GameWorld Game::_gameWorld;
 EventManager Game::_eventManager;
 sf::View Game::_view;
+float Game::_smoothFPS = 0.f;

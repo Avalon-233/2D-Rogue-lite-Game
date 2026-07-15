@@ -26,6 +26,7 @@ private:
 	static GameWorld _gameWorld;
 	static EventManager _eventManager;
 	static sf::View _view;
+	static float _smoothFPS;
 
 	static void BeginPlaying();
 

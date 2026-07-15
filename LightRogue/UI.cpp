@@ -33,12 +33,31 @@ void UIManager::DrawOverlay(sf::RenderWindow& window)
         _activeOverlay->Draw(window);
 }
 
+void UIManager::DrawFPS(sf::RenderWindow& window, int fps)
+{
+    if (!_hudFontReady) return;
+
+    const sf::Vector2f pos(1420.f, 10.f);
+    const sf::Color color(180, 220, 180);
+
+    sf::Text text(_hudFont, std::to_string(fps) + " FPS", 18);
+    text.setFillColor(color);
+    text.setPosition(pos);
+
+    const sf::FloatRect b = text.getLocalBounds();
+    text.setOrigin({ b.position.x + b.size.x, 0.f });
+
+    window.draw(text);
+}
+
+
 void UIManager::LoadOverlayResources()
 {
     _splashUI.LoadResources();
     _pauseUI.LoadResources();
     _upgradeUI.LoadResources();
     _gameOverUI.LoadResources();
+    _hudFontReady = OverlayUI::LoadFont(_hudFont);
 }
 
 void UIManager::OnSplashEnter()

@@ -88,7 +88,7 @@ void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 	sf::CircleShape Vision(_player->GetVision(),200);
 	Vision.setOrigin({ _player->GetVision(), _player->GetVision() });
 	Vision.setPosition(_player->GetPosition());
-	Vision.setFillColor(sf::Color(255, 255, 255,64));
+	Vision.setFillColor(sf::Color(255, 255, 255,32));
 	renderWindow.draw(Vision);
 
 	for(auto& it : _enemies)
@@ -352,16 +352,7 @@ sf::Vector2f GameWorld::GetRandomSpawnPosition()const
 void GameWorld::DrawUI(sf::RenderWindow& renderWindow)
 {
 	_uiManager.DrawPlayerHUD(renderWindow, _player.get());
-	/*
-	for (auto& enemy : _enemies)
-	{
-		_uiManager.DrawEnemyHealthBar(renderWindow, enemy.get());
-	}*/
-}
-
-void GameWorld::DrawUpgradeUI(sf::RenderWindow& renderWindow)
-{
-	//_uiManager.DrawUpgradeChoices(renderWindow, _player.get());
+	
 }
 
 bool GameWorld::IsPlayerDead()const
