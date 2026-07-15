@@ -1,5 +1,7 @@
 #pragma once
 
+//designed with AI assistance
+
 struct SaveData;
 
 class SaveManager

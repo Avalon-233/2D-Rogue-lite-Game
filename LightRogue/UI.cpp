@@ -4,6 +4,8 @@
 #include "Enemy.h"
 #include"ResourceLoader.h"
 
+//specific darwing assisted by AI
+
 void UIManager::ActivateOverlay(GameState state)
 {
     switch (state)
@@ -147,7 +149,7 @@ void SplashOverlayUI::Draw(sf::RenderWindow& window)
     shade.setFillColor(sf::Color(0, 0, 0, 120));
     window.draw(shade);
 
-    // 刷新悬停状态
+    // Update hover state
     int hit = HitTest(window, sf::Mouse::getPosition(window));
     _startHovered = (hit == 1);
     _loadHovered = _hasSaveFile && (hit == 2);
@@ -300,11 +302,10 @@ void PauseOverlayUI::Draw(sf::RenderWindow& window)
     const sf::Vector2f windowSize(sf::Vector2u(1440.f, 810.f));
     const sf::Vector2f center(windowSize.x / 2.f, windowSize.y / 2.f);
 
-    // 刷新悬停
     UpdateHover(window, sf::Mouse::getPosition(window));
     const float time = _animationClock.getElapsedTime().asSeconds();
 
-    // 遮罩
+    // overlay
     sf::RectangleShape overlay(windowSize);
     overlay.setFillColor(sf::Color(4, 7, 22, 190));
     window.draw(overlay);
@@ -325,7 +326,6 @@ void PauseOverlayUI::Draw(sf::RenderWindow& window)
     DrawAnimatedButton(window, GetContinueButtonBounds(window),
         _continueHovered, "CONTINUE",
         sf::Color(255, 205, 90), sf::Color(255, 220, 120), 0.f, _font);
-
     // Quit button
     DrawAnimatedButton(window, GetQuitButtonBounds(window),
         _quitHovered, "QUIT GAME",
@@ -411,7 +411,7 @@ void PauseOverlayUI::DrawAnimatedButton(sf::RenderWindow& window,
     sf::Text label(font, labelText, hovered ? 42u : 38u);
     label.setFillColor(hovered
         ? sf::Color(24, 28, 42) : sf::Color(245, 248, 255));
-    // 手动居中（不用 CenterText，因为它是 const 且需要非 const）
+    //to center
     {
         const sf::FloatRect b = label.getLocalBounds();
         label.setOrigin({ b.position.x + b.size.x / 2.f,
@@ -485,14 +485,6 @@ void StatusBar::Draw(sf::RenderWindow& window)
 
 UIManager::UIManager()
 {
-    /*
-    _fontLoaded =
-        _font.openFromFile("SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
-        _font.openFromFile("LightRogue/SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
-        _font.openFromFile("../SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
-        _font.openFromFile("../../SFML-3.1.0/examples/text/resources/tuffy.ttf") ||
-        _font.openFromFile("C:/Windows/Fonts/segoeui.ttf");
-        */
     _playerHealthBar.SetSize(220.f, 18.f);
     _playerHealthBar.SetColors(
         sf::Color(40, 40, 40),
@@ -504,12 +496,6 @@ UIManager::UIManager()
         sf::Color(40, 40, 40),
         sf::Color(80, 150, 255)
     );
-    /*
-    _enemyHealthBar.SetSize(42.f, 6.f);
-    _enemyHealthBar.SetColors(
-        sf::Color(30, 30, 30),
-        sf::Color(230, 60, 60)
-    );*/
 }
 
 void UIManager::DrawPlayerHUD(sf::RenderWindow& window, const Player* player)
@@ -562,18 +548,18 @@ void UpgradeOverlayUI::Draw(sf::RenderWindow& window)
     const float startX = windowSize.x / 2.f
         - (CardSize.x * 3.f + CardGap * 2.f) / 2.f;
 
-    // 遮罩
+    // overlay
     sf::RectangleShape overlay(windowSize);
     overlay.setFillColor(sf::Color(4, 7, 18, 218));
     window.draw(overlay);
 
-    // 顶部装饰线
+    // top line
     sf::RectangleShape topRule({ 660.f, 2.f });
     topRule.setPosition({ windowSize.x / 2.f - 330.f, 104.f });
     topRule.setFillColor(sf::Color(68, 214, 221, 150));
     window.draw(topRule);
 
-    // 标题
+    // title
     sf::Text title(_font, "CHOOSE YOUR LIGHT CODE", 34);
     title.setFillColor(sf::Color(238, 212, 132));
     CenterText(title, { windowSize.x / 2.f, 58.f });
@@ -584,7 +570,7 @@ void UpgradeOverlayUI::Draw(sf::RenderWindow& window)
     CenterText(subtitle, { windowSize.x / 2.f, 112.f });
     window.draw(subtitle);
 
-    // 三张卡片
+    // cards
     for (int i = 0; i < 3; ++i)
     {
         DrawOneCard(window,
@@ -592,7 +578,7 @@ void UpgradeOverlayUI::Draw(sf::RenderWindow& window)
             i + 1, _cachedOptions[i], _font);
     }
 
-    // 底部线
+    // bottom line
     sf::RectangleShape bottomRule({ 520.f, 2.f });
     bottomRule.setPosition({ windowSize.x / 2.f - 260.f, 604.f });
     bottomRule.setFillColor(sf::Color(198, 164, 72, 135));
@@ -669,7 +655,7 @@ void UpgradeOverlayUI::DrawOneCard(sf::RenderWindow& window,
     badge.setOutlineColor(gold);
     window.draw(badge);
 
-    // 快捷键数字
+    //num to choose
     sf::Text numText(font, std::to_string(shortcut), 30);
     numText.setFillColor(sf::Color(244, 232, 174));
     {
@@ -691,7 +677,7 @@ void UpgradeOverlayUI::DrawOneCard(sf::RenderWindow& window,
     DrawUpgradeIcon(window, position + sf::Vector2f(CardSize.x / 2.f, 126.f),
         upgradeType);
 
-    // 升级名称
+    // upgrade name
     {
         sf::Text nameText(font, GetUpgradeName(upgradeType), 23);
         nameText.setFillColor(sf::Color(241, 225, 164));
@@ -701,7 +687,7 @@ void UpgradeOverlayUI::DrawOneCard(sf::RenderWindow& window,
         window.draw(nameText);
     }
 
-    // 升级描述
+    // upgrade discribe
     {
         sf::Text descText(font, GetUpgradeDescription(upgradeType), 16);
         descText.setFillColor(sf::Color(190, 215, 220));

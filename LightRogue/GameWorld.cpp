@@ -59,7 +59,7 @@ bool GameWorld::LoadGame()
 	return true;
 }
 
-
+//overload Add()
 void GameWorld::Add(std::unique_ptr<Player> player)
 {
 	_player = std::move(player);
@@ -202,7 +202,7 @@ void GameWorld::CleanUp()
 		else itPickup = _pickups.erase(itPickup);
 	}
 	/*
-	//AI:a more efficient way to remove GameObjects
+	//AI: a more efficient way alternative to remove GameObjects
 	_enemies.erase(
 		std::remove_if(_enemies.begin(), _enemies.end(),
 			[](const std::unique_ptr<Enemy>& p) { return !p->IsExisting(); }),
@@ -298,7 +298,7 @@ void GameWorld::UpdateSpawning(float deltaTime)
 			else
 				type = EnemyType::Giant;
 		}
-		else //enemy has been enhanced
+		else //Enemies Enhanced
 		{
 			float roll = static_cast<float>(rand()) / RAND_MAX;
 			if (roll < 0.35f)

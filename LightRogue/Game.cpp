@@ -69,13 +69,11 @@ void Game::HandleEvent(const sf::Event::KeyPressed& event)
 
 }
 
-void Game::HandleEvent(const sf::Event::Resized& event)
+void Game::HandleEvent(const sf::Event::Resized& event)//designed with AI assistance
 {
-	float worldW = 1440.f;
-	float worldH = 810.f;
 	float windowW = static_cast<float>(event.size.x);
 	float windowH = static_cast<float>(event.size.y);
-	float worldRatio = worldW / worldH;
+	float worldRatio = 1440.f / 810.f;
 	float windowRatio = windowW / windowH;
 
 	float vpLeft = 0.f, vpTop = 0.f, vpW = 1.f, vpH = 1.f;
@@ -94,8 +92,6 @@ void Game::HandleEvent(const sf::Event::Resized& event)
 	_view.setViewport(sf::FloatRect({ vpLeft, vpTop }, { vpW, vpH }));
 	_mainWindow.setView(_view);
 }
-
-
 
 void Game::HandleEvent(const sf::Event&) {}//other events
 
@@ -165,7 +161,7 @@ void Game::ProcessEvents()
 		});
 }
 
-sf::Vector2i Game::ToWorld(sf::Vector2i pixel)
+sf::Vector2i Game::ToWorld(sf::Vector2i pixel)//designed with AI assistance
 {
 	sf::Vector2f f = _mainWindow.mapPixelToCoords(pixel);
 	return { static_cast<int>(f.x), static_cast<int>(f.y) };

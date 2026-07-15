@@ -205,7 +205,7 @@ void Enemy::Shoot()
 	_gameWorld->Add(std::move(projectile));
 }
 
-void Enemy::Bomb()
+void Enemy::Bomb()//waiting to develop
 {
 
 }

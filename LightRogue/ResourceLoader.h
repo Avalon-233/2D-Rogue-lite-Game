@@ -1,11 +1,11 @@
 #pragma once
-
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Audio/Music.hpp>
-
 #include <array>
 #include <string>
+
+//designed with AI assistance
 
 inline bool LoadTextureFromResource(sf::Texture& texture, const std::string& filename)
 {

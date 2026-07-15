@@ -2,6 +2,8 @@
 #include "SaveData.h"
 #include <cstdio>
 
+//designed with AI assistance
+
 const char* SaveManager::Path()
 {
 	return "save.dat";

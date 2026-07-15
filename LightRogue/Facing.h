@@ -1,6 +1,7 @@
 #pragma once
-
 #include <cmath>
+
+//designed with AI assistance
 
 inline float ResolveFacingScaleX(float directionX, float currentScaleX, bool textureFacesRight)
 {

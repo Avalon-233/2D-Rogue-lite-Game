@@ -1,9 +1,10 @@
 #pragma once
-
 #include "SFML/Graphics.hpp"
 #include"GameEvent.h"
 #include <string>
 #include <array>
+
+//specific darwing assisted by AI
 
 class Player;
 class Enemy;
@@ -75,7 +76,7 @@ public:
     void LoadResources() override;
     void OnEnter() override;
     void UpdateHover(const sf::RenderWindow& window,sf::Vector2i position)override;
-    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position)const override;  // 0=nathing, 1=continue, 2=save 3=exit
+    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position)const override;  // 0=nothing, 1=continue, 2=save 3=exit
     void Draw(sf::RenderWindow& window)override;
 
 private:
@@ -104,12 +105,12 @@ class UpgradeOverlayUI : public OverlayUI
 public:
     UpgradeOverlayUI() = default;
 
-    void LoadResources() override;       // 只需字体
+    void LoadResources() override;
     void OnEnter() override;
-    void OnEnter(const std::array<int, 3>& options);    // 重载：带选项数据
+    void OnEnter(const std::array<int, 3>& options);    // override: with options
 
-    // UpdateHover：卡片高亮（后续可加）
-    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position) const override;  // 0=未命中, 1/2/3=卡片
+    // UpdateHover
+    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position) const override;  // 0=nothing, 1/2/3=card
 
     void Draw(sf::RenderWindow& window)override;
 
@@ -118,7 +119,7 @@ private:
         sf::Vector2f center, int upgradeType) const;
     static const char* GetUpgradeName(int upgradeType);
     static const char* GetUpgradeDescription(int upgradeType);
-    // 布局常量（与 DrawUpgradeChoices 保持一致）
+    
     static constexpr sf::Vector2f CardSize = { 250.f, 365.f };
     static constexpr float        CardGap = 38.f;
     static constexpr float        CardY = 184.f;
@@ -130,7 +131,7 @@ private:
 
     sf::Font                _font;
     bool                    _fontReady = false;
-    std::array<int, 3>      _cachedOptions = { 1, 2, 3 };  // OnEnter 时快照
+    std::array<int, 3>      _cachedOptions = { 1, 2, 3 };
 };
 
 class GameOverOverlayUI : public OverlayUI
@@ -140,7 +141,7 @@ public:
 
     void LoadResources() override;
     void OnEnter() override;
-    void OnEnter(float gameTime, int score, int level);    // 带数据重载
+    void OnEnter(float gameTime, int score, int level);
 
     void Draw(sf::RenderWindow& window) override;
 
