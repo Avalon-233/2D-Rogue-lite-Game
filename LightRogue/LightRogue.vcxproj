@@ -30,26 +30,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -78,6 +78,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -96,6 +97,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +114,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>SFML-3.1.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -133,6 +136,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>SFML-3.1.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -200,6 +204,19 @@
     <Media Include="..\resource\shoot.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CopySfmlRuntime" AfterTargets="Build" Condition="'$(Platform)'=='x64'">
+    <ItemGroup>
+      <ResourceFile Include="$(ProjectDir)..\resource\**\*.*" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)'=='Debug'">
+      <SfmlRuntimeDll Include="$(ProjectDir)SFML-3.1.0\bin\sfml-system-d-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-window-d-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-graphics-d-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-audio-d-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-network-d-3.dll" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)'=='Release'">
+      <SfmlRuntimeDll Include="$(ProjectDir)SFML-3.1.0\bin\sfml-system-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-window-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-graphics-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-audio-3.dll;$(ProjectDir)SFML-3.1.0\bin\sfml-network-3.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SfmlRuntimeDll)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ResourceFile)" DestinationFolder="$(OutDir)resource\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
