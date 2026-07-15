@@ -73,12 +73,18 @@ void SplashOverlayUI::LoadResources()
 void SplashOverlayUI::OnEnter()
 {
     _animationClock.restart();
-    _buttonHovered = false;
+    _startHovered = false;
+    _loadHovered = false;
 }
 
 void SplashOverlayUI::UpdateHover(const sf::RenderWindow& window, sf::Vector2i position)
 {
-    _buttonHovered = (HitTest(window, position) == 1);
+    const sf::Vector2f mousePoint(
+        static_cast<float>(position.x),
+        static_cast<float>(position.y)
+    );
+    _startHovered = GetStartButtonBounds(window).contains(mousePoint);
+    _loadHovered = _hasSaveFile && GetLoadButtonBounds(window).contains(mousePoint);
 }
 
 int SplashOverlayUI::HitTest(const sf::RenderWindow& window, sf::Vector2i position) const
@@ -87,12 +93,13 @@ int SplashOverlayUI::HitTest(const sf::RenderWindow& window, sf::Vector2i positi
         static_cast<float>(position.x),
         static_cast<float>(position.y)
     );
+    if (_hasSaveFile && GetLoadButtonBounds(window).contains(mousePoint)) return 2;
     return GetStartButtonBounds(window).contains(mousePoint) ? 1 : 0;
 }
 
 void SplashOverlayUI::Draw(sf::RenderWindow& window)
 {
-    const sf::Vector2f windowSize(window.getSize());
+    const sf::Vector2f windowSize(sf::Vector2f(1440.f, 810.f));
     const sf::Vector2f center(windowSize.x / 2.f, windowSize.y / 2.f);
 
     if (_backgroundReady)
@@ -122,34 +129,36 @@ void SplashOverlayUI::Draw(sf::RenderWindow& window)
     window.draw(shade);
 
     // 刷新悬停状态
-    _buttonHovered = (HitTest(window, sf::Mouse::getPosition(window)) == 1);
+    int hit = HitTest(window, sf::Mouse::getPosition(window));
+    _startHovered = (hit == 1);
+    _loadHovered = _hasSaveFile && (hit == 2);
     const float time = _animationClock.getElapsedTime().asSeconds();
     const sf::FloatRect buttonBounds = GetStartButtonBounds(window);
     const sf::Vector2f buttonCenter(
         buttonBounds.position.x + buttonBounds.size.x / 2.f,
         buttonBounds.position.y + buttonBounds.size.y / 2.f
     );
-    const float pulse = _buttonHovered
+    const float pulse = _startHovered
         ? std::sin(time * 8.f) * 4.f : std::sin(time * 2.f) * 2.f;
     const sf::Vector2f buttonSize(
-        buttonBounds.size.x + (_buttonHovered ? 28.f : 0.f) + pulse,
-        buttonBounds.size.y + (_buttonHovered ? 12.f : 0.f) + pulse
+        buttonBounds.size.x + (_startHovered ? 28.f : 0.f) + pulse,
+        buttonBounds.size.y + (_startHovered ? 12.f : 0.f) + pulse
     );
 
     sf::RectangleShape glow(buttonSize + sf::Vector2f(24.f, 18.f));
     glow.setOrigin(glow.getSize() / 2.f);
     glow.setPosition(buttonCenter);
-    glow.setFillColor(_buttonHovered
+    glow.setFillColor(_startHovered
         ? sf::Color(255, 205, 90, 70) : sf::Color(80, 140, 255, 35));
     window.draw(glow);
 
     sf::RectangleShape button(buttonSize);
     button.setOrigin(buttonSize / 2.f);
     button.setPosition(buttonCenter);
-    button.setFillColor(_buttonHovered
+    button.setFillColor(_startHovered
         ? sf::Color(255, 205, 90, 230) : sf::Color(26, 31, 48, 230));
     button.setOutlineThickness(3.f);
-    button.setOutlineColor(_buttonHovered
+    button.setOutlineColor(_startHovered
         ? sf::Color(255, 245, 190) : sf::Color(115, 170, 255));
     window.draw(button);
 
@@ -165,27 +174,69 @@ void SplashOverlayUI::Draw(sf::RenderWindow& window)
     CenterText(subtitle, { center.x, 220.f });
     window.draw(subtitle);
 
-    sf::Text startText(_font, sf::String(L"\u5F00\u59CB\u6E38\u620F"),
-        _buttonHovered ? 50u : 46u);
-    startText.setFillColor(_buttonHovered
+    sf::Text startText(_font, "NEW GAME", 
+        _startHovered ? 50u : 46u);
+    startText.setFillColor(_startHovered
         ? sf::Color(24, 28, 42) : sf::Color(245, 248, 255));
-    CenterText(startText, buttonCenter + sf::Vector2f(0.f, _buttonHovered ? -3.f : 0.f));
+    CenterText(startText, buttonCenter + sf::Vector2f(0.f, _startHovered ? -3.f : 0.f));
     window.draw(startText);
 
-    sf::Text hint(_font, "Move the mouse over the text, then click to start.", 20);
-    hint.setFillColor(sf::Color(185, 195, 210));
-    CenterText(hint, { center.x, buttonCenter.y + 88.f });
-    window.draw(hint);
+    if (_hasSaveFile)
+    {
+        const sf::FloatRect loadBounds = GetLoadButtonBounds(window);
+        const sf::Vector2f loadCenter(
+            loadBounds.position.x + loadBounds.size.x / 2.f,
+            loadBounds.position.y + loadBounds.size.y / 2.f);
+        const float loadPulse = _loadHovered
+            ? std::sin(time * 8.f + 0.5f) * 4.f : std::sin(time * 2.f + 0.5f) * 2.f;
+        const sf::Vector2f loadSize(
+            loadBounds.size.x + (_loadHovered ? 28.f : 0.f) + loadPulse,
+            loadBounds.size.y + (_loadHovered ? 12.f : 0.f) + loadPulse);
+
+        sf::RectangleShape lGlow(loadSize + sf::Vector2f(24.f, 18.f));
+        lGlow.setOrigin(lGlow.getSize() / 2.f);
+        lGlow.setPosition(loadCenter);
+        lGlow.setFillColor(_loadHovered
+            ? sf::Color(80, 180, 255, 70) : sf::Color(80, 140, 255, 35));
+        window.draw(lGlow);
+
+        sf::RectangleShape lBtn(loadSize);
+        lBtn.setOrigin(loadSize / 2.f);
+        lBtn.setPosition(loadCenter);
+        lBtn.setFillColor(_loadHovered
+            ? sf::Color(80, 180, 255, 230) : sf::Color(26, 31, 48, 230));
+        lBtn.setOutlineThickness(3.f);
+        lBtn.setOutlineColor(_loadHovered
+            ? sf::Color(180, 220, 255) : sf::Color(115, 170, 255));
+        window.draw(lBtn);
+
+        sf::Text loadText(_font, "LOAD GAME", _loadHovered ? 42u : 38u);
+        loadText.setFillColor(_loadHovered
+            ? sf::Color(24, 28, 42) : sf::Color(200, 220, 255));
+        CenterText(loadText, loadCenter + sf::Vector2f(0.f, _loadHovered ? -3.f : 0.f));
+        window.draw(loadText);
+    }
+
 }
 
 sf::FloatRect SplashOverlayUI::GetStartButtonBounds(
     const sf::RenderWindow& window) const
 {
-    const sf::Vector2u pixelSize = window.getSize();
+    const sf::Vector2u pixelSize = sf::Vector2u(1440.f, 810.f);
     const float centerX = static_cast<float>(pixelSize.x) / 2.f;
     const float centerY = static_cast<float>(pixelSize.y) * 0.66f;
     return sf::FloatRect({ centerX - 170.f, centerY - 44.f }, { 340.f, 88.f });
 }
+
+sf::FloatRect SplashOverlayUI::GetLoadButtonBounds(
+    const sf::RenderWindow& window) const
+{
+    const sf::Vector2u pixelSize = sf::Vector2u(1440.f, 810.f);
+    const float centerX = static_cast<float>(pixelSize.x) / 2.f;
+    const float centerY = static_cast<float>(pixelSize.y) * 0.66f + 100.f;
+    return sf::FloatRect({ centerX - 170.f, centerY - 44.f }, { 340.f, 88.f });
+}
+
 
 void PauseOverlayUI::LoadResources()
 {
@@ -196,6 +247,7 @@ void PauseOverlayUI::OnEnter()
 {
     _animationClock.restart();
     _continueHovered = false;
+    _saveHovered = false;
     _quitHovered = false;
 }
 
@@ -208,6 +260,7 @@ void PauseOverlayUI::UpdateHover(const sf::RenderWindow& window,
     );
     _continueHovered = GetContinueButtonBounds(window).contains(mousePoint);
     _quitHovered = GetQuitButtonBounds(window).contains(mousePoint);
+    _saveHovered = GetSaveButtonBounds(window).contains(mousePoint);
 }
 
 int PauseOverlayUI::HitTest(const sf::RenderWindow& window,
@@ -218,13 +271,14 @@ int PauseOverlayUI::HitTest(const sf::RenderWindow& window,
         static_cast<float>(position.y)
     );
     if (GetContinueButtonBounds(window).contains(mousePoint)) return 1;
-    if (GetQuitButtonBounds(window).contains(mousePoint))     return 2;
+    if (GetQuitButtonBounds(window).contains(mousePoint))     return 3;
+    if (GetSaveButtonBounds(window).contains(mousePoint))     return 2;
     return 0;
 }
 
 void PauseOverlayUI::Draw(sf::RenderWindow& window)
 {
-    const sf::Vector2f windowSize(window.getSize());
+    const sf::Vector2f windowSize(sf::Vector2u(1440.f, 810.f));
     const sf::Vector2f center(windowSize.x / 2.f, windowSize.y / 2.f);
 
     // 刷新悬停
@@ -258,27 +312,40 @@ void PauseOverlayUI::Draw(sf::RenderWindow& window)
         _quitHovered, "QUIT GAME",
         sf::Color(180, 80, 60), sf::Color(220, 100, 80), 1.f, _font);
 
+    DrawAnimatedButton(window, GetSaveButtonBounds(window),
+        _saveHovered, "SAVE",
+        sf::Color(80, 160, 220), sf::Color(120, 200, 255), 0.5f, _font);
+
     sf::Text hint(_font, "Move the mouse over a button, then click.", 18);
     hint.setFillColor(sf::Color(140, 150, 170));
-    CenterText(hint, { center.x, center.y + 180.f });
+    CenterText(hint, { center.x, center.y + 260.f });
     window.draw(hint);
 }
 
 sf::FloatRect PauseOverlayUI::GetContinueButtonBounds(
     const sf::RenderWindow& window) const
 {
-    const float cx = static_cast<float>(window.getSize().x) / 2.f;
-    const float cy = static_cast<float>(window.getSize().y) * 0.48f;
+    const float cx = static_cast<float>(sf::Vector2u(1440.f, 810.f).x) / 2.f;
+    const float cy = static_cast<float>(sf::Vector2u(1440.f, 810.f).y) * 0.48f;
     return sf::FloatRect({ cx - 200.f, cy - 40.f }, { 400.f, 80.f });
 }
 
 sf::FloatRect PauseOverlayUI::GetQuitButtonBounds(
     const sf::RenderWindow& window) const
 {
-    const float cx = static_cast<float>(window.getSize().x) / 2.f;
-    const float cy = static_cast<float>(window.getSize().y) * 0.48f + 110.f;
+    const float cx = static_cast<float>(sf::Vector2u(1440.f, 810.f).x) / 2.f;
+    const float cy = static_cast<float>(sf::Vector2u(1440.f, 810.f).y) * 0.48f + 180.f;
     return sf::FloatRect({ cx - 200.f, cy - 40.f }, { 400.f, 80.f });
 }
+
+sf::FloatRect PauseOverlayUI::GetSaveButtonBounds(
+    const sf::RenderWindow& window) const
+{
+    const float cx = static_cast<float>(sf::Vector2u(1440.f, 810.f).x) / 2.f;
+    const float cy = static_cast<float>(sf::Vector2u(1440.f, 810.f).y) * 0.48f + 90.f;
+    return sf::FloatRect({ cx - 200.f, cy - 40.f }, { 400.f, 80.f });
+}
+
 
 void PauseOverlayUI::DrawAnimatedButton(sf::RenderWindow& window,
     const sf::FloatRect& bounds, bool hovered,
@@ -457,7 +524,7 @@ void UpgradeOverlayUI::OnEnter(const std::array<int, 3>& options)
 int UpgradeOverlayUI::HitTest(const sf::RenderWindow& window,
     sf::Vector2i position) const
 {
-    const float windowWidth = static_cast<float>(window.getSize().x);
+    const float windowWidth = static_cast<float>(sf::Vector2u(1440.f, 810.f).x);
     for (int i = 0; i < 3; ++i)
     {
         if (GetCardBounds(i, windowWidth).contains(
@@ -472,7 +539,7 @@ void UpgradeOverlayUI::Draw(sf::RenderWindow& window)
 {
     if (!_fontReady) return;
 
-    const sf::Vector2f windowSize(window.getSize());
+    const sf::Vector2f windowSize(sf::Vector2u(1440.f, 810.f));
     const float startX = windowSize.x / 2.f
         - (CardSize.x * 3.f + CardGap * 2.f) / 2.f;
 
@@ -851,7 +918,7 @@ void GameOverOverlayUI::Draw(sf::RenderWindow& window)
 {
     if (!_fontReady) return;
 
-    const sf::Vector2f windowSize(window.getSize());
+    const sf::Vector2f windowSize(sf::Vector2u(1440.f, 810.f));
 
     sf::RectangleShape overlay(windowSize);
     overlay.setFillColor(sf::Color(20, 4, 4, 220));

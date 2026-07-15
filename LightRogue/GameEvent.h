@@ -11,8 +11,10 @@ struct PlayerDamaged {};
 struct PlayerShoot {};
 struct EnemyDamaged {};
 struct EnemyKilled {};
+struct SaveRequested {};
+struct LoadRequested {};
 
-using GameEvent = std::variant<LevelUp, GameStateChange,UpgradeSelected, PlayerDamaged, PlayerShoot, EnemyDamaged, EnemyKilled>;
+using GameEvent = std::variant<LevelUp, GameStateChange,UpgradeSelected, PlayerDamaged, PlayerShoot, EnemyDamaged, EnemyKilled, SaveRequested, LoadRequested >;
 
 class EventManager
 {

@@ -18,12 +18,14 @@ public:
 private:
 	static bool IsExiting();
 	static void GameLoop();
+	static sf::Vector2i ToWorld(sf::Vector2i pixel);
 
 	static GameState _gameState;
 	static sf::RenderWindow _mainWindow;
 	static sf::Clock _clock;
 	static GameWorld _gameWorld;
 	static EventManager _eventManager;
+	static sf::View _view;
 
 	static void BeginPlaying();
 
@@ -31,6 +33,7 @@ private:
 	static void HandleEvent(const sf::Event::MouseMoved& event);
 	static void HandleEvent(const sf::Event::MouseButtonPressed& event);
 	static void HandleEvent(const sf::Event::KeyPressed& event);
+	static void HandleEvent(const sf::Event::Resized&);
 	static void HandleEvent(const sf::Event&);
 	static void ProcessEvents();
 

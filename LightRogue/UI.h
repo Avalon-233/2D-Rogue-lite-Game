@@ -46,21 +46,25 @@ class SplashOverlayUI : public OverlayUI
 public:
     SplashOverlayUI() = default;
 
-    void LoadResources() override;      // 原来就有
-    void OnEnter() override;            // 原名 RestartAnimation → 统一为 OnEnter
+    void LoadResources() override;
+    void OnEnter() override;
     void UpdateHover(const sf::RenderWindow& window,sf::Vector2i position)override;
-    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position) const override;   // 原名 IsStartButtonHit
+    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position) const override;
     void Draw(sf::RenderWindow& window)override;
+    void SetHasSaveFile(bool v) { _hasSaveFile = v; }
 
 private:
     sf::FloatRect GetStartButtonBounds(const sf::RenderWindow& window) const;
+    sf::FloatRect GetLoadButtonBounds(const sf::RenderWindow& window) const;
 
     sf::Clock _animationClock;
     sf::Texture _backgroundTexture;
     sf::Font _font;
     bool _backgroundReady = false;
     bool _fontReady = false;
-    bool _buttonHovered = false;
+    bool _startHovered = false;
+    bool _loadHovered = false;
+    bool _hasSaveFile = false;
 };
 
 class PauseOverlayUI : public OverlayUI
@@ -71,12 +75,13 @@ public:
     void LoadResources() override;
     void OnEnter() override;
     void UpdateHover(const sf::RenderWindow& window,sf::Vector2i position)override;
-    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position)const override;  // 0=未命中, 1=继续, 2=退出
+    int  HitTest(const sf::RenderWindow& window,sf::Vector2i position)const override;  // 0=nathing, 1=continue, 2=save 3=exit
     void Draw(sf::RenderWindow& window)override;
 
 private:
     sf::FloatRect GetContinueButtonBounds(const sf::RenderWindow& window) const;
     sf::FloatRect GetQuitButtonBounds(const sf::RenderWindow& window) const;
+    sf::FloatRect GetSaveButtonBounds(const sf::RenderWindow& window) const;
     void DrawAnimatedButton(sf::RenderWindow& window,
         const sf::FloatRect& bounds,
         bool hovered,
@@ -91,6 +96,7 @@ private:
     bool _fontReady = false;
     bool _continueHovered = false;
     bool _quitHovered = false;
+    bool _saveHovered = false;
 };
 
 class UpgradeOverlayUI : public OverlayUI
@@ -180,17 +186,12 @@ public:
     int  HitTestOverlay(const sf::RenderWindow& window,sf::Vector2i position) const;
     void DrawOverlay(sf::RenderWindow& window);
     void ActivateOverlay(GameState state);
+    void SetSplashHasSaveFile(bool v) { _splashUI.SetHasSaveFile(v); }
 
     void DrawPlayerHUD(sf::RenderWindow& window, const Player* player);
-    //void DrawEnemyHealthBar(sf::RenderWindow& window, const Enemy* enemy);
-    //void DrawUpgradeChoices(sf::RenderWindow& window, const Player* player);
-    //void DrawGameOver(sf::RenderWindow& window,float time,int score,int level);
 
 private:
-    /*
-    void DrawUpgradeCard(sf::RenderWindow& window, sf::Vector2f position, sf::Vector2f size, int shortcut, int upgradeType);
-    void DrawUpgradeIcon(sf::RenderWindow& window, sf::Vector2f center, int upgradeType);
-     */
+    
     void DrawText(sf::RenderWindow& window, const std::string& text,
         unsigned int size, sf::Vector2f position,
         sf::Color color, bool centered, const sf::Font& font);
@@ -203,9 +204,6 @@ private:
 
     StatusBar _playerHealthBar;
     StatusBar _playerExperienceBar;
-    //StatusBar _enemyHealthBar;
-
-   // sf::Font _font;
-    //bool _fontLoaded = false;
+    
 
 };

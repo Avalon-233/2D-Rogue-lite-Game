@@ -20,6 +20,8 @@ Projectile::~Projectile()
 void Projectile::Update(float deltaTime)
 {
 	_sprite.move(_speed * deltaTime);
+	if (GetPosition().x < -50.f || GetPosition().x > 1490.f || GetPosition().y < -50.f || GetPosition().y > 860.f)
+		Destroy();
 }
 
 void Projectile::HandleCollision(Player* player)

@@ -68,7 +68,8 @@ void Player::Update(float deltaTime)
 	{
 		if (_shootTimer >= _shootCooldown)
 		{
-			Shoot(sf::Mouse::getPosition(*_mainWindow));
+			auto position_f=_mainWindow->mapPixelToCoords(sf::Mouse::getPosition(*_mainWindow));
+			Shoot(sf::Vector2i(position_f.x,position_f.y));
 			_shootTimer=0.f;
 		}
 	}
