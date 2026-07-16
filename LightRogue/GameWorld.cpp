@@ -84,6 +84,7 @@ void GameWorld::DrawAll(sf::RenderWindow& renderWindow)
 {
 	sf::Sprite _background(_backgroundTexture);
 	renderWindow.draw(_background);
+
 	if (_player)_player->Draw(renderWindow);
 	sf::CircleShape Vision(_player->GetVision(),200);
 	Vision.setOrigin({ _player->GetVision(), _player->GetVision() });

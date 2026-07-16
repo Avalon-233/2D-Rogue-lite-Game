@@ -63,9 +63,9 @@ private:
 	float _maxHP=100;
 	float _speed=100;
 	//shoot-about
-	float _shootCooldown=0.5f;
+	float _shootCooldown=0.48f;
 	float _shootTimer=0.f;
-	float _shootDamage=10.f;
+	float _shootDamage=15.f;
 	float _shootSpeed=500.f;
 	int _projectileCount=1;
 	sf::Texture _projectileTexture;

@@ -218,7 +218,7 @@ void Game::GameLoop()
 	float deltaTime = _clock.restart().asSeconds();
 	if (deltaTime > 0.1f) deltaTime = 0.1f;
 	float FPS = 1.f / deltaTime;
-	if (_smoothFPS)_smoothFPS = _smoothFPS * 0.9f + FPS * 0.1f;
+	if (_smoothFPS)_smoothFPS = _smoothFPS * 0.99f + FPS * 0.01f;
 	else _smoothFPS = FPS;
 
 	if (_gameState == Playing)
